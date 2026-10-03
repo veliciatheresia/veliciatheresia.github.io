@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kuis Tim</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#2b1a5c;--bg2:#46178f;--ink:#1d1340;--r:#e21b3c;--b:#1368ce;--y:#d89e00;--g:#26890c}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:linear-gradient(160deg,var(--bg2),var(--bg));color:#fff;overflow-x:hidden}
+#app{min-height:100%;display:flex;flex-direction:column;padding:16px;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
+.c{margin:auto;text-align:center;width:100%;max-width:640px}
+h1{font-size:2rem}h2{font-size:1.5rem;margin:.5rem 0}p{opacity:.85;margin:.4rem 0}
+code{background:rgba(255,255,255,.15);padding:2px 6px;border-radius:6px}
+.spin{width:48px;height:48px;border:5px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;margin:0 auto 16px;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.badge{display:inline-block;background:#fff;color:var(--bg2);font-weight:800;font-size:3rem;padding:14px 36px;border-radius:20px;margin:12px 0;animation:pop .5s}
+@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+.chip{padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:600;border:2px dashed rgba(255,255,255,.3)}
+.chip.on{background:#fff;color:var(--bg2);border:2px solid #fff}
+.btn{background:#fff;color:var(--bg2);border:0;border-radius:14px;font-size:1.2rem;font-weight:800;padding:14px 32px;cursor:pointer;margin-top:20px;box-shadow:0 5px 0 rgba(0,0,0,.25)}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.top{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:10px;gap:8px}
+.tag{background:rgba(255,255,255,.18);padding:4px 12px;border-radius:999px;font-size:.9rem;display:inline-block}
+.bar{height:12px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:#fff;transition:width .1s linear}
+.bar i.low{background:#ff5b6e}
+.tm{font-size:2.4rem;font-weight:800;margin:6px 0;text-align:center}
+.hint{opacity:.85;text-align:center;font-size:.95rem;margin:0 0 4px}
+.qt{background:#fff;color:var(--ink);padding:20px;border-radius:16px;font-size:1.2rem;margin:12px 0 16px;box-shadow:0 5px 0 rgba(0,0,0,.2);text-align:left}
+.opts{display:grid;gap:12px;flex:1;grid-template-columns:1fr 1fr}
+.opts.long{grid-template-columns:1fr}
+.o{border:0;border-radius:14px;color:#fff;font-size:1.1rem;font-weight:800;padding:16px 12px;min-height:90px;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;gap:10px;text-align:left;line-height:1.3}
+.o:active{transform:translateY(3px)}
+.opts.tf .o{min-height:200px;font-size:1.6rem}
+.o0{background:var(--r)}.o1{background:var(--b)}.o2{background:var(--y)}.o3{background:var(--g)}
+.opts.tf .o0{background:var(--g)}.opts.tf .o1{background:var(--r)}
+.o.dim{opacity:.3}.o.sel{outline:5px solid #fff}
+.big{font-size:5rem}
+.ok{color:#7dff8a}.no{color:#ff8a98}.mid{color:#ffd23f}
+.pts{font-size:2rem;font-weight:800}
+.fbbox{background:rgba(255,255,255,.14);padding:12px 14px;border-radius:12px;margin-top:16px;text-align:left;font-size:1rem;line-height:1.4}
+.row{display:flex;align-items:center;gap:12px;background:#fff;color:var(--ink);border-radius:12px;padding:12px 16px;margin:8px 0;font-weight:700;font-size:1.1rem;animation:slide .5s both}
+.row.me{outline:4px solid #ffd23f}
+.row .rk{width:32px;font-weight:800;color:var(--bg2)}
+.row .nm{flex:1;text-align:left}
+@keyframes slide{from{transform:translateX(-60px);opacity:0}to{transform:none;opacity:1}}
+.trans{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;animation:fadein .4s}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.tcard{position:absolute;width:min(82vw,380px);padding:28px 20px;border-radius:20px;text-align:center;font-weight:800;font-size:1.6rem;color:#fff}
+.tcard small{display:block;font-size:1rem;opacity:.9;margin-top:8px;font-weight:600}
+.t1{background:linear-gradient(135deg,var(--g),var(--r));animation:outL 1.6s .6s ease-in forwards}
+.t2{background:linear-gradient(135deg,var(--b),var(--y));transform:translateX(120vw);animation:inR 1.2s 1.6s cubic-bezier(.2,1.3,.4,1) forwards}
+.tt{position:absolute;top:14%;font-size:2rem;font-weight:800;animation:pop .6s}
+@keyframes outL{to{transform:translateX(-120vw) rotate(-12deg)}}
+@keyframes inR{to{transform:translateX(0)}}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:20px 0;height:260px}
+.pd{width:30%;max-width:140px;border-radius:12px 12px 0 0;background:#fff;color:var(--ink);text-align:center;font-weight:800;padding-top:8px;animation:rise 1s both;transform-origin:bottom}
+.pd .nm{font-size:1.1rem}.pd .sc{font-size:.9rem;opacity:.7}
+.pd.p1{height:100%;background:#ffd23f;animation-delay:1.4s}
+.pd.p2{height:72%;background:#d9dee8;animation-delay:.8s}
+.pd.p3{height:52%;background:#e7b27a;animation-delay:.2s}
+@keyframes rise{from{transform:scaleY(0);opacity:0}to{transform:scaleY(1);opacity:1}}
+.crown{font-size:2.4rem}
+.cf{position:fixed;top:-20px;width:10px;height:14px;z-index:30;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+/* drag & drop / interaktif */
+.chip2{display:inline-block;background:var(--bg2);color:#fff;font-weight:700;padding:8px 14px;border-radius:10px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;line-height:1.25;box-shadow:0 3px 0 rgba(0,0,0,.25);font-size:1rem;text-align:left}
+.chip2.on{outline:3px solid #ffd23f}
+.bank{display:flex;flex-wrap:wrap;gap:10px;padding:12px;border:2px dashed rgba(255,255,255,.35);border-radius:14px;min-height:64px;align-items:center;justify-content:center}
+.bank .chip2{background:#fff;color:var(--bg2)}
+.slot{display:inline-block;min-width:104px;min-height:42px;vertical-align:middle;border:2px dashed #9a8cc4;border-radius:10px;padding:3px;margin:2px 4px;background:#f2eefb}
+.slot.full{border-style:solid;background:#e8defa}
+.slot.hover{background:#ffe9a8;border-color:var(--y)}
+.fillq{line-height:2.7}
+.rowslot{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+.rowslot .lab{font-weight:700;font-size:1rem}
+.rowslot .slot{display:block;min-height:50px;margin:0}
+.ghost{position:fixed;z-index:60;pointer-events:none;transform:translate(-50%,-50%) rotate(-3deg);box-shadow:0 10px 24px rgba(0,0,0,.4);max-width:80vw}
+.tok{display:inline-block;padding:2px 5px;border-radius:6px;cursor:pointer;line-height:1.6}
+.tok.flag{background:#ffd23f;font-weight:700}
+.fixrow{background:rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;margin-top:10px;text-align:left}
+.fxs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.fx{border:2px solid #fff;background:transparent;color:#fff;border-radius:10px;padding:8px 12px;font-size:.95rem;font-weight:700;cursor:pointer}
+.fx.on{background:#fff;color:var(--bg2)}
+
+#adminBtn{position:fixed;right:10px;bottom:calc(8px + env(safe-area-inset-bottom,0px));background:transparent;color:rgba(255,255,255,.35);border:0;font-size:.8rem;cursor:pointer;z-index:10}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:70;padding:16px}
+#modal .box{background:#fff;color:var(--ink);padding:22px;border-radius:16px;width:100%;max-width:320px;text-align:center}
+#modal input{width:100%;padding:12px;font-size:1.1rem;border:2px solid #ccc;border-radius:10px;margin:12px 0;text-align:center}
+#modal .btn{margin-top:4px;background:var(--bg2);color:#fff;padding:10px 24px;font-size:1rem}
+#modal .x{background:#ddd;color:#333}
+#err{color:#d00;font-size:.9rem;min-height:1.2em}
+@media (prefers-reduced-motion:reduce){.row,.pd,.badge{animation:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<button id="adminBtn">Masuk sebagai Guru</button>
+<div id="modal"><div class="box">
+  <h3>Masuk sebagai Guru</h3>
+  <input id="pw" type="password" placeholder="Katasandi" autocomplete="off">
+  <div id="err"></div>
+  <button class="btn" id="pwOk">Masuk</button>
+  <button class="btn x" id="pwNo">Batal</button>
+</div></div>
+
+<script>
+/* ===================== PENGATURAN ===================== */
+const ADMIN_PASSWORD = "velicia123";   // ganti katasandi guru
+
+// Tempel konfigurasi dari Firebase Console (Project settings > Your apps > Web app)
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyASIMSQ1KYz9h02QSUZ7ynp59pXDuvuM2Y",
+  authDomain: "kuis-velicia.firebaseapp.com",
+  databaseURL: "https://kuis-velicia-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kuis-velicia",
+  storageBucket: "kuis-velicia.firebasestorage.app",
+  messagingSenderId: "1092459365835",
+  appId: "1:1092459365835:web:e0dcc1eb35177f637c624e"
+};
+
+const MAX_TEAMS = 8;
+const SECTION_SECONDS = [10, 10, 30, 90];  // waktu per soal untuk Bagian 1, 2, 3, 4 (detik)
+const SPEED_BONUS = 0.2;                   // bonus kecepatan maksimal 20% dari poin soal (0 = matikan)
+const POINTS_PER_SCORE = 100;              // 1 skor soal = 100 poin papan peringkat
+const REVEAL_MS = 5000;                    // lama umpan balik "makna" tampil setelah tiap soal
+
+// Beberapa kelas bisa jalan bersamaan dengan link berbeda: kuis-sejarah.html?room=kelas5a
+const ROOM = (new URLSearchParams(location.search).get('room') || 'utama').toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,30) || 'utama';
+
+/* ===================== BANK SOAL ===================== */
+const SECS = [
+  {name:'Pilihan Ganda',        icon:'▲ ◆ ● ■', hint:'Ketuk satu jawaban'},
+  {name:'Benar / Salah',        icon:'✔ ✘',     hint:'Apakah pernyataan ini benar?'},
+  {name:'Isian Kata',           icon:'📝',      hint:'Seret kata ke kotak kosong (atau ketuk kata, lalu ketuk kotak)'},
+  {name:'Tantangan Interaktif', icon:'🧩',      hint:''}
+];
+
+const KEYWORDS_ACC = ['kopi','teh','nila','kakao'];
+function parseTokens(s){ return s.split(' ').map(t=>{ const m=t.match(/^\{([AB])\}(.*)$/); return m?{w:m[2],g:m[1]}:{w:t,g:''}; }); }
+
+const POOL = [
+ /* ---- Bagian 1: Pilihan ganda (skor 1) ---- */
+ [
+  {kind:'mc',score:1,text:"Alasan utama Portugis, Spanyol, Belanda, dan Jepang berlomba menguasai Indonesia adalah …",
+   opts:["letak yang strategis dan kekayaan alam yang melimpah","jumlah penduduknya sedikit","belum ada pemerintahan di Indonesia","tanahnya tandus dan tidak subur"],ans:0,
+   fb:"Letak strategis dan kekayaan alam menjadi alasan utama penjajahan."},
+  {kind:'mc',score:1,text:"Tiga isi Politik Etis atau Trias Van Deventer adalah …",
+   opts:["irigasi, edukasi, emigrasi","irigasi, industri, emigrasi","edukasi, perdagangan, emigrasi","irigasi, edukasi, ekspor"],ans:0,
+   fb:"Trias Van Deventer: irigasi, edukasi, emigrasi."},
+  {kind:'mc',score:1,text:"Edukasi dalam Politik Etis disebut awal mula pergerakan nasional karena …",
+   opts:["sekolah rakyat membuat pribumi dapat membaca sehingga tumbuh kesadaran untuk melawan penjajahan","Belanda ingin segera meninggalkan Indonesia","sekolah hanya dibuka untuk orang Belanda","pelajar dilarang bertanya tentang nasib bangsa"],ans:0,
+   fb:"Sekolah rakyat membuka akses membaca; hal ini menjadi awal mula pergerakan nasional."}
+ ],
+ /* ---- Bagian 2: Benar / Salah (skor 1) ---- */
+ [
+  {kind:'tf',score:1,text:"Pada masa tanam paksa, rakyat diwajibkan menanam tanaman ekspor seperti kopi, teh, nila, dan kakao.",ans:0,
+   fb:"Benar. Rakyat wajib menanam kopi, teh, nila, dan kakao serta menyerahkan 20% hasil."},
+  {kind:'tf',score:1,text:"Politik Etis dikeluarkan karena Belanda murni ingin berbuat baik, tanpa ada kritik dari siapa pun.",ans:1,
+   fb:"Salah. Politik Etis muncul sebagai respons kritik terhadap tanam paksa."},
+  {kind:'tf',score:1,text:"Indonesia pada masa penjajahan hanya pernah dijajah oleh bangsa Belanda.",ans:1,
+   fb:"Salah. Portugis, Spanyol, Belanda, dan Jepang berlomba menguasai Indonesia."}
+ ],
+ /* ---- Bagian 3: Isian kata (skor 2: 1 per kotak) ---- */
+ [
+  {kind:'fill',score:2,hint:SECS[2].hint,
+   parts:["Pada masa tanam paksa, rakyat menanam tanaman ekspor seperti ",{s:0}," dan ",{s:1}," serta menyerahkan 20% hasilnya kepada pemerintah Hindia Belanda."],
+   bank:['kopi','teh','padi','jagung','nila','kakao','singkong'].map(w=>({id:w,t:w})),
+   key:[KEYWORDS_ACC,KEYWORDS_ACC],
+   fb:"Tanaman ekspor tanam paksa: kopi, teh, nila, kakao. Padi, jagung, dan singkong bukan tanaman ekspor tanam paksa."},
+  {kind:'fill',score:2,hint:SECS[2].hint,
+   parts:["Buku Max Havelaar ditulis oleh Eduard Douwes Dekker dengan nama pena ",{s:0},", yang pernah tinggal di ",{s:1}," sebagai pegawai Belanda."],
+   bank:['Multatuli','Banten','Brooshooft','Yogyakarta','Van Deventer','Maluku'].map(w=>({id:w,t:w})),
+   key:[['Multatuli'],['Banten']],
+   fb:"Multatuli menulis Max Havelaar tentang penderitaan rakyat Banten."},
+  {kind:'fill',score:2,hint:SECS[2].hint,
+   parts:["Sekolah rakyat dibentuk melalui kebijakan ",{s:0}," agar rakyat pribumi dapat ",{s:1},"."],
+   bank:['edukasi','irigasi','emigrasi','membaca','berdagang','berlayar'].map(w=>({id:w,t:w})),
+   key:[['edukasi'],['membaca']],
+   fb:"Edukasi membentuk sekolah rakyat agar pribumi dapat membaca."}
+ ],
+ /* ---- Bagian 4: Tantangan interaktif (skor 3) ---- */
+ [
+  {kind:'order',score:3,hint:"Seret kartu ke garis waktu sampai urutannya benar (atau ketuk kartu, lalu ketuk kotak)",
+   text:"Susunlah kejadian dari yang paling awal sampai akhir:",
+   rows:["1 · Paling awal","2","3","4","5 · Paling akhir"],
+   bank:[
+    {id:'a',t:"Belanda mengeluarkan Trias Van Deventer (Politik Etis)"},
+    {id:'b',t:"Rakyat diwajibkan menanam tanaman ekspor dan menyerahkan hasilnya (tanam paksa)"},
+    {id:'c',t:"Akses pendidikan terbuka dan menjadi awal pergerakan nasional"},
+    {id:'d',t:"Masyarakat Eropa menuntut Belanda membalas budi"},
+    {id:'e',t:"Rakyat menderita dan muncul kritik dari para tokoh"}],
+   key:['b','e','d','a','c'],
+   fb:"Tanam paksa → penderitaan dan kritik → tuntutan balas budi → Politik Etis → edukasi membuka pergerakan nasional."},
+  {kind:'match',score:3,hint:"Seret kartu peran ke tokoh yang tepat (atau ketuk kartu, lalu ketuk kotak)",
+   text:"Jodohkan tokoh dengan perannya:",
+   rows:["Eduard Douwes Dekker (Multatuli)","Conrad Theodore van Deventer","Pieter Brooshooft"],
+   bank:[
+    {id:'P',t:"menulis bahwa Belanda punya hutang kehormatan dan harus membalas budi"},
+    {id:'Q',t:"berkeliling Pulau Jawa tahun 1887 dan melapor kepada 12 politisi"},
+    {id:'R',t:"menulis buku tentang penderitaan rakyat Banten akibat tanam paksa"}],
+   key:['R','P','Q'],
+   fb:"Multatuli menulis Max Havelaar; Van Deventer menyatakan hutang kehormatan; Brooshooft melapor kepada 12 politisi."},
+  {kind:'find',score:3,hint:"Ketuk kata yang salah (ada 2 kesalahan), lalu pilih kata perbaikannya",
+   tokens:parseTokens("Politik Etis muncul sebagai respons kritik terhadap tanam paksa. Isinya adalah irigasi, {A}industri, dan emigrasi. Emigrasi memindahkan sebagian penduduk dari {B}Sumatra {B}ke {B}Jawa {B}dan {B}Madura untuk mengurangi kepadatan penduduk. Edukasi membuka sekolah rakyat sehingga pribumi dapat membaca."),
+   fixOpts:['edukasi','perdagangan','Jawa dan Madura ke Sumatra','Jawa ke Papua'],
+   fix:{A:'edukasi',B:'Jawa dan Madura ke Sumatra'},
+   fb:"Isi Politik Etis: irigasi, edukasi, emigrasi. Emigrasi memindahkan penduduk Jawa dan Madura ke Sumatra dan pulau lain."}
+ ]
+];
+const MAXRAW = POOL.reduce((s,sec)=>s+sec.reduce((a,q)=>a+q.score,0),0);
+
+/* ===================== UTIL ===================== */
+const app = document.getElementById('app');
+const H = h => { app.innerHTML = h; };
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const SHAPES = ['▲','◆','●','■'];
+let role='student', myTeam=0, curRound=-1, locked=false, tick=null, Q=null;
+
+let cid;
+try { cid = sessionStorage.getItem('kuis_cid'); if(!cid){ cid='c'+Math.random().toString(36).slice(2,10); sessionStorage.setItem('kuis_cid',cid);} }
+catch(e){ cid='c'+Math.random().toString(36).slice(2,10); }
+const myHostId = 'h'+Math.random().toString(36).slice(2,10);
+
+function stopTick(){ if(tick){ clearInterval(tick); tick=null; } }
+function startTimer(sec,onEnd,total){
+  stopTick();
+  total = total || sec;
+  const end = performance.now()+sec*1000;
+  tick = setInterval(()=>{
+    const left = Math.max(0,end-performance.now());
+    const bar=document.getElementById('barI'), tm=document.getElementById('tm');
+    if(bar){ bar.style.width=(left/(total*1000)*100)+'%'; bar.classList.toggle('low',left<3000); }
+    if(tm) tm.textContent=Math.ceil(left/1000);
+    if(left<=0){ stopTick(); onEnd&&onEnd(); }
+  },100);
+}
+function confetti(){
+  const cols=['#ffd23f','#e21b3c','#1368ce','#26890c','#fff'];
+  for(let i=0;i<70;i++){
+    const d=document.createElement('div'); d.className='cf';
+    d.style.left=Math.random()*100+'vw'; d.style.background=cols[i%cols.length];
+    d.style.animationDuration=(2.5+Math.random()*2.5)+'s'; d.style.animationDelay=(Math.random()*1.5)+'s';
+    document.body.appendChild(d); setTimeout(()=>d.remove(),7000);
+  }
+}
+
+/* ===================== RENDER (siswa & guru) ===================== */
+function render(m){
+  stopTick();
+  switch(m.t){
+    case 'wait':
+      H(`<div class="c"><div class="spin"></div><h2>Menunggu guru…</h2><p>Halaman akan tersambung otomatis saat guru membuka ruangan.</p></div>`); break;
+    case 'full':
+      H(`<div class="c"><div class="big">🚫</div><h2>Ruangan penuh</h2><p>Maksimal ${MAX_TEAMS} tim sudah bergabung.</p></div>`); break;
+    case 'closed':
+      H(`<div class="c"><div class="big">⏳</div><h2>Kuis sedang berjalan</h2><p>Tunggu sampai kuis selesai.</p></div>`); break;
+    case 'lobby': {
+      const chips=Array.from({length:MAX_TEAMS},(_,i)=>`<span class="chip ${m.teams.includes(i+1)?'on':''}">Tim ${i+1}</span>`).join('');
+      if(role==='host'){
+        H(`<div class="c"><h1>Mode Guru</h1><p>Siswa yang membuka link ini otomatis mendapat tim.</p>
+          <h2>${m.teams.length} / ${MAX_TEAMS} tim bergabung</h2><div class="chips">${chips}</div>
+          <button class="btn" id="startBtn" ${m.teams.length?'':'disabled'}>▶ Mulai Bersamaan</button></div>`);
+        document.getElementById('startBtn').onclick=hostStart;
+      } else {
+        H(`<div class="c"><p>Kamu masuk sebagai</p><div class="badge">Tim ${myTeam}</div><h2>Menunggu guru memulai…</h2><div class="chips">${chips}</div></div>`);
+      }
+      break; }
+    case 'q': renderQ(m); break;
+    case 'answered':
+      H(`<div class="c"><div class="big">📨</div><h2>Jawaban terkirim!</h2><p>Menunggu tim lain…</p></div>`); break;
+    case 'reveal': {
+      const map={full:['✅','Benar!','ok'],part:['🟡','Sebagian benar','mid'],none:['❌','Belum tepat','no'],skip:['⏰','Waktu habis','no']};
+      const [icon,txt,cls]=map[m.status];
+      H(`<div class="c"><div class="big">${icon}</div><h2 class="${cls}">${txt}</h2>
+        <p>Skor soal: <b>${m.sc} / ${m.max}</b></p><div class="pts">+${m.pts}</div>
+        <p>Total: <b>${m.score}</b> poin · Peringkat ${m.rank}</p>
+        <div class="fbbox">💡 ${m.fb}</div></div>`); break; }
+    case 'hq':
+      H(`<div class="c"><div class="tag">Bagian ${m.sec}: ${SECS[m.sec-1].name} · Soal ${m.n}/3 (${m.round+1}/12)</div>
+        <div class="bar" style="margin-top:14px"><i id="barI"></i></div><div class="tm" id="tm">${m.total}</div>
+        <h2>Soal sedang berjalan di perangkat siswa</h2><p id="ansCnt">Terjawab: ${m.answered} / ${m.total_teams}</p></div>`);
+      startTimer(m.total,()=>{},m.total); break;
+    case 'hcnt': {
+      const el=document.getElementById('ansCnt'); if(el) el.textContent=`Terjawab: ${m.answered} / ${m.total_teams}`; return; }
+    case 'hreveal':
+      H(`<div class="c"><div class="big">📊</div><h2>Waktu habis</h2><p>${m.ok} dari ${m.total} tim menjawab benar sepenuhnya</p></div>`); break;
+    case 'board': {
+      const me = role!=='host';
+      const rows=m.rows.map((r,i)=>`<div class="row ${me&&r.team===myTeam?'me':''}" style="animation-delay:${i*.12}s">
+        <span class="rk">${i+1}</span><span class="nm">Tim ${r.team}${me&&r.team===myTeam?' (Kamu)':''}</span><span>${r.score}</span></div>`).join('');
+      if(m.final){
+        const t=m.rows;
+        const pod=[[1,'p2'],[0,'p1'],[2,'p3']].filter(x=>t[x[0]]).map(([i,c])=>
+          `<div class="pd ${c}">${i===0?'<div class="crown">👑</div>':''}<div class="nm">Tim ${t[i].team}</div><div class="sc">${t[i].score} poin</div><div class="sc">${t[i].raw}/${MAXRAW}</div><div style="font-size:1.6rem">${i+1}</div></div>`).join('');
+        const rest=t.slice(3).map((r,i)=>`<div class="row" style="animation-delay:${2.2+i*.1}s"><span class="rk">${i+4}</span><span class="nm">Tim ${r.team}</span><span>${r.score} <small style="opacity:.6">(${r.raw}/${MAXRAW})</small></span></div>`).join('');
+        H(`<div class="c"><h1>🏆 Tim ${t[0].team} Juara 1!</h1><div class="podium">${pod}</div>${rest}
+          ${role==='host'?'<button class="btn" id="again">↺ Main Lagi</button>':''}</div>`);
+        if(role==='host') document.getElementById('again').onclick=hostReset;
+        setTimeout(confetti,1500);
+      } else {
+        H(`<div class="c"><h1>🏅 ${m.title}</h1>${rows}</div>`);
+      }
+      break; }
+    case 'trans': {
+      const a=SECS[m.from], b=SECS[m.to];
+      H(`<div class="trans"><div class="tt">Bagian ${m.to+1}!</div>
+        <div class="tcard t1">${a.icon}<br>${a.name}<small>Selesai</small></div>
+        <div class="tcard t2">${b.icon}<br>${b.name}<small>${SECTION_SECONDS[m.to]} detik per soal</small></div></div>`); break; }
+  }
+}
+
+/* ===================== SOAL DI PERANGKAT SISWA ===================== */
+function renderQ(m){
+  const v=m.view; curRound=m.round; locked=false;
+  Q={m,vals:Array(v.n||0).fill(''),sel:null,flags:[],fx:{}};
+  const head=`<div class="top"><span class="tag">Bagian ${m.sec}: ${SECS[m.sec-1].name} · Soal ${m.n}/3</span><span class="tag">Tim ${myTeam}</span></div>
+    <div class="bar"><i id="barI"></i></div><div class="tm" id="tm">${Math.ceil(m.dur)}</div>`;
+  const simple = (v.kind==='mc'||v.kind==='tf');
+  if(simple){
+    const long = v.kind==='mc' && v.opts.some(o=>o.t.length>38);
+    const opts = v.kind==='tf'
+      ? ['Benar','Salah'].map((o,i)=>`<button class="o o${i}" data-i="${i}">${i===0?'✔':'✘'} ${o}</button>`).join('')
+      : v.opts.map((o,k)=>`<button class="o o${k}" data-i="${o.i}"><span>${SHAPES[k]}</span><span>${o.t}</span></button>`).join('');
+    H(head+`<div class="hint">${v.hint}</div><div class="qt">${v.text}</div><div class="opts ${v.kind} ${long?'long':''}">${opts}</div>`);
+    document.querySelectorAll('.o').forEach(b=>b.onclick=()=>answerSimple(+b.dataset.i,b));
+  } else {
+    H(head+`<div class="hint">${v.hint}</div><div id="asg"></div>`);
+    if(v.kind==='find') setupFind(); else setupAssign();
+  }
+  const onEnd=()=>{
+    if(locked) return;
+    if(simple){ locked=true; document.querySelectorAll('.o').forEach(b=>b.disabled=true); }
+    else submitAssign();
+  };
+  if(m.dur<=0) onEnd(); else startTimer(m.dur,onEnd,m.total);
+}
+function sendAnswer(a){ R('ans/'+cid).set({round:curRound,a,at:SV()}); }
+function answerSimple(i,btn){
+  if(locked) return; locked=true; stopTick();
+  document.querySelectorAll('.o').forEach(b=>{ b.disabled=true; b.classList.add(b===btn?'sel':'dim'); });
+  sendAnswer(i);
+}
+function submitAssign(){
+  if(locked) return; locked=true; stopTick();
+  const a = Q.m.view.kind==='find' ? {f:Q.flags.map(i=>({i,fx:Q.fx[i]||''}))} : Q.vals.slice();
+  const btn=document.getElementById('sendBtn'); if(btn){ btn.disabled=true; btn.textContent='Mengirim…'; }
+  sendAnswer(a);
+}
+
+/* ---- slot & kartu (isian, urutkan, jodohkan) ---- */
+function drawAssign(){
+  const v=Q.m.view, root=document.getElementById('asg'); if(!root) return;
+  const byId={}; v.bank.forEach(b=>byId[b.id]=b.t);
+  const chip=(id,from)=>`<span class="chip2 ${Q.sel&&Q.sel.id===id?'on':''}" data-id="${id}" data-from="${from}">${byId[id]}</span>`;
+  const slot=i=>`<span class="slot ${Q.vals[i]?'full':''}" data-slot="${i}">${Q.vals[i]?chip(Q.vals[i],i):''}</span>`;
+  let body;
+  if(v.kind==='fill') body=`<div class="qt fillq">${v.parts.map(p=>typeof p==='string'?p:slot(p.s)).join('')}</div>`;
+  else body=`<div class="qt"><div style="font-weight:700">${v.text}</div>${v.rows.map((r,i)=>`<div class="rowslot"><span class="lab">${r}</span>${slot(i)}</div>`).join('')}</div>`;
+  const used=new Set(Q.vals);
+  const bank=v.bank.filter(b=>!used.has(b.id)).map(b=>chip(b.id,-1)).join('');
+  root.innerHTML=body+`<div class="bank" id="bank">${bank||'<small style="opacity:.7">Semua kartu sudah dipakai</small>'}</div>
+    <div style="text-align:center"><button class="btn" id="sendBtn" ${locked?'disabled':''}>Kirim jawaban ✔</button></div>`;
+  document.getElementById('sendBtn').onclick=submitAssign;
+}
+function place(id,from,to){
+  const v=Q.vals;
+  if(to===-1){ if(from>=0) v[from]=''; }
+  else if(to!==from){ const ex=v[to]; v[to]=id; if(from>=0) v[from]=ex; }
+  Q.sel=null; drawAssign();
+}
+function setupAssign(){
+  const root=document.getElementById('asg');
+  drawAssign();
+  root.addEventListener('pointerdown',e=>{
+    const chip=e.target.closest('.chip2'); if(!chip||locked) return;
+    e.preventDefault();
+    const id=chip.dataset.id, from=+chip.dataset.from, sx=e.clientX, sy=e.clientY;
+    let ghost=null, moved=false;
+    const clearHover=()=>document.querySelectorAll('.slot.hover').forEach(s=>s.classList.remove('hover'));
+    const move=ev=>{
+      if(!moved && Math.hypot(ev.clientX-sx,ev.clientY-sy)>8){
+        moved=true; ghost=chip.cloneNode(true); ghost.classList.add('ghost'); ghost.classList.remove('on'); document.body.appendChild(ghost);
+      }
+      if(moved){
+        ghost.style.left=ev.clientX+'px'; ghost.style.top=ev.clientY+'px';
+        clearHover();
+        const el=document.elementFromPoint(ev.clientX,ev.clientY), sl=el&&el.closest('[data-slot]');
+        if(sl) sl.classList.add('hover');
+      }
+    };
+    const up=ev=>{
+      window.removeEventListener('pointermove',move); window.removeEventListener('pointerup',up); window.removeEventListener('pointercancel',up);
+      clearHover(); if(ghost) ghost.remove();
+      if(moved){
+        const el=document.elementFromPoint(ev.clientX,ev.clientY);
+        const sl=el&&el.closest('[data-slot]'), bk=el&&el.closest('#bank');
+        if(sl) place(id,from,+sl.dataset.slot); else if(bk) place(id,from,-1); else drawAssign();
+      } else {
+        Q.sel=(Q.sel&&Q.sel.id===id)?null:{id,from}; drawAssign();
+      }
+    };
+    window.addEventListener('pointermove',move); window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up);
+  });
+  root.addEventListener('click',e=>{
+    if(locked||!Q.sel||e.target.closest('.chip2')) return;
+    const sl=e.target.closest('[data-slot]'), bk=e.target.closest('#bank');
+    if(sl) place(Q.sel.id,Q.sel.from,+sl.dataset.slot); else if(bk) place(Q.sel.id,Q.sel.from,-1);
+  });
+}
+
+/* ---- temukan kesalahan ---- */
+function drawFind(){
+  const v=Q.m.view, root=document.getElementById('asg'); if(!root) return;
+  const toks=v.tokens.map((w,i)=>`<span class="tok ${Q.flags.includes(i)?'flag':''}" data-i="${i}">${w}</span>`).join(' ');
+  const fixes=Q.flags.map(i=>`<div class="fixrow"><b>“${v.tokens[i].replace(/[.,]/g,'')}”</b> diganti dengan:
+    <div class="fxs">${v.opts.map((o,k)=>`<button class="fx ${Q.fx[i]===o?'on':''}" data-i="${i}" data-k="${k}">${o}</button>`).join('')}</div></div>`).join('');
+  root.innerHTML=`<div class="qt" style="line-height:1.9">${toks}</div>
+    <div style="text-align:center;opacity:.85;font-size:.9rem">Kata ditandai: ${Q.flags.length} / 2</div>${fixes}
+    <div style="text-align:center"><button class="btn" id="sendBtn" ${locked?'disabled':''}>Kirim jawaban ✔</button></div>`;
+  document.getElementById('sendBtn').onclick=submitAssign;
+}
+function setupFind(){
+  const root=document.getElementById('asg');
+  drawFind();
+  root.addEventListener('click',e=>{
+    if(locked) return;
+    const tok=e.target.closest('.tok'), fx=e.target.closest('.fx');
+    if(tok){
+      const i=+tok.dataset.i, at=Q.flags.indexOf(i);
+      if(at>=0){ Q.flags.splice(at,1); delete Q.fx[i]; }
+      else { Q.flags.push(i); if(Q.flags.length>2){ const old=Q.flags.shift(); delete Q.fx[old]; } }
+      drawFind();
+    } else if(fx){
+      Q.fx[+fx.dataset.i]=Q.m.view.opts[+fx.dataset.k]; drawFind();
+    }
+  });
+}
+
+/* ===================== FIREBASE ===================== */
+let db=null, R=null, offset=0;
+const now=()=>Date.now()+offset;
+const SV=()=>firebase.database.ServerValue.TIMESTAMP;
+
+function initFirebase(){
+  if(!FIREBASE_CONFIG.databaseURL || FIREBASE_CONFIG.databaseURL.includes('ISI')){
+    H(`<div class="c"><div class="big">🔧</div><h2>Firebase belum diisi</h2>
+      <p>Isi <code>FIREBASE_CONFIG</code> di bagian atas script file ini.</p></div>`);
+    document.getElementById('adminBtn').style.display='none';
+    return false;
+  }
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db=firebase.database();
+  R=p=>db.ref(`rooms/${ROOM}/${p}`);
+  db.ref('.info/serverTimeOffset').on('value',s=>{ offset=s.val()||0; });
+  return true;
+}
+
+/* ===================== SISWA ===================== */
+let hostUp=false, lastState=null, shown=null, connHandler=null;
+
+function startStudent(){
+  role='student';
+  render({t:'wait'}); shown='wait';
+  const me=R('players/'+cid);
+  connHandler=db.ref('.info/connected').on('value',s=>{
+    if(s.val()) me.onDisconnect().remove().then(()=>me.set(SV()));
+  });
+  R('host').on('value',s=>{ hostUp=!!s.val(); refresh(); });
+  R('to/'+cid).on('value',s=>{ lastState=s.val(); refresh(); });
+}
+function stopStudent(){
+  const me=R('players/'+cid);
+  db.ref('.info/connected').off('value',connHandler);
+  R('host').off(); R('to/'+cid).off();
+  me.onDisconnect().cancel(); me.remove();
+}
+function refresh(){
+  if(role!=='student') return;
+  if(!hostUp || !lastState){
+    if(shown!=='wait'){ shown='wait'; render({t:'wait'}); }
+    return;
+  }
+  if(shown===lastState.seq) return;
+  shown=lastState.seq;
+  myTeam=lastState.team||myTeam;
+  let m=lastState.m;
+  if(m.t==='q') m={...m, dur:Math.max(0,Math.min(m.total,(m.endAt-now())/1000))};
+  render(m);
+}
+
+/* ===================== PENILAIAN (guru) ===================== */
+function grade(q,a){
+  const arr=n=>{ const r=[]; for(let i=0;i<n;i++) r[i]=(a&&a[i])||''; return r; };
+  switch(q.kind){
+    case 'mc': case 'tf': return (a!==undefined && a!==null && Number(a)===q.ans)?1:0;
+    case 'fill': { const v=arr(q.key.length); return q.key.reduce((s,acc,i)=>s+(acc.includes(v[i])?1:0),0); }
+    case 'match': { const v=arr(q.key.length); return q.key.reduce((s,k,i)=>s+(v[i]===k?1:0),0); }
+    case 'order': { const v=arr(q.key.length); const c=q.key.reduce((s,k,i)=>s+(v[i]===k?1:0),0); return c===5?3:(c>=3?2:(c>=1?1:0)); }
+    case 'find': {
+      const fl=(a&&a.f)?Object.values(a.f):[];
+      const found={A:false,B:false}; let wrong=false;
+      fl.forEach(x=>{
+        const t=q.tokens[x.i]; const g=t?t.g:'';
+        if(!g) wrong=true; else if(x.fx===q.fix[g]) found[g]=true;
+      });
+      return (found.A?1:0)+(found.B?1:0)+((fl.length>0&&!wrong)?1:0);
+    }
+  }
+  return 0;
+}
+function makeView(q){
+  const v={kind:q.kind,hint:q.hint||''};
+  switch(q.kind){
+    case 'mc': v.text=q.text; v.opts=shuffle(q.opts.map((t,i)=>({i,t}))); v.hint=SECS[0].hint; break;
+    case 'tf': v.text=q.text; v.hint=SECS[1].hint; break;
+    case 'fill': v.parts=q.parts; v.bank=shuffle(q.bank); v.n=q.key.length; break;
+    case 'order': case 'match': v.text=q.text; v.rows=q.rows; v.bank=shuffle(q.bank); v.n=q.rows.length; break;
+    case 'find': v.tokens=q.tokens.map(t=>t.w); v.opts=shuffle(q.fixOpts); break;
+  }
+  return v;
+}
+
+/* ===================== GURU (HOST) ===================== */
+const G={phase:'lobby',players:new Map(),round:-1,timer:null,start:0,dur:10,seq:0,lobbyKey:null,rej:new Set()};
+
+function becomeHost(force){
+  R('host').transaction(cur=>(cur&&!force)?undefined:{id:myHostId,at:Date.now()},(err,committed)=>{
+    if(err){ alert('Gagal terhubung ke Firebase. Periksa pengaturan.'); return; }
+    if(!committed){
+      if(confirm('Sudah ada guru aktif di ruangan ini (atau sesi sebelumnya belum terlepas). Ambil alih paksa?')) becomeHost(true);
+      return;
+    }
+    stopStudent();
+    role='host';
+    document.getElementById('adminBtn').style.display='none';
+    R('host').onDisconnect().remove();
+    Promise.all([R('to').remove(),R('ans').remove()]).then(attachHost);
+  },false);
+}
+function attachHost(){
+  G.phase='lobby'; G.players=new Map(); G.round=-1; G.lobbyKey=null; G.rej=new Set();
+  render({t:'lobby',teams:[]});
+  R('host').on('value',s=>{ const v=s.val(); if(v && v.id!==myHostId) location.reload(); });
+  R('players').on('value',onPlayers);
+  R('ans').on('value',s=>{ const a=s.val()||{}; Object.keys(a).forEach(id=>handleAns(id,a[id])); });
+}
+function rawSend(id,m,team){ R('to/'+id).set({team:team||0, seq:myHostId+':'+(++G.seq), m}); }
+function send(p,m){ rawSend(p.cid,m,p.team); }
+function bcast(m){ G.players.forEach(p=>send(p,m)); render(m); }
+function freeTeam(){
+  const used=new Set([...G.players.values()].map(p=>p.team));
+  for(let i=1;i<=MAX_TEAMS;i++) if(!used.has(i)) return i; return 0;
+}
+function bcastLobby(force){
+  const teams=[...G.players.values()].map(p=>p.team).sort((a,b)=>a-b);
+  const key=teams.join(',');
+  if(key===G.lobbyKey && !force) return;
+  G.lobbyKey=key;
+  G.players.forEach(p=>send(p,{t:'lobby',teams}));
+  if(G.phase==='lobby') render({t:'lobby',teams});
+}
+const connected=()=>[...G.players.values()].filter(p=>p.connected);
+const rows=()=>[...G.players.values()].map(p=>({team:p.team,score:p.score,raw:p.raw})).sort((a,b)=>b.score-a.score||b.raw-a.raw||a.team-b.team);
+
+function onPlayers(snap){
+  const online=new Set(Object.keys(snap.val()||{}));
+  online.forEach(id=>{
+    const p=G.players.get(id);
+    if(p){ p.connected=true; return; }
+    if(G.phase==='lobby'){
+      const team=freeTeam();
+      if(!team){ if(!G.rej.has(id)){ G.rej.add(id); rawSend(id,{t:'full'}); } return; }
+      G.players.set(id,{cid:id,team,connected:true,score:0,raw:0,answered:false,pts:0,sc:0,cur:null,o:[]});
+    } else if(!G.rej.has(id)){ G.rej.add(id); rawSend(id,{t:'closed'}); }
+  });
+  G.players.forEach((p,id)=>{
+    if(online.has(id)) return;
+    if(G.phase==='lobby'){ G.players.delete(id); R('to/'+id).remove(); }
+    else p.connected=false;
+  });
+  if(G.phase==='lobby') bcastLobby();
+  else if(G.phase==='q') checkAll();
+}
+function handleAns(id,d){
+  const p=G.players.get(id);
+  if(!p||G.phase!=='q'||d.round!==G.round||p.answered||!d.at) return;
+  const el=Math.max(0,(d.at-G.start)/1000);
+  if(el>G.dur+2) return;
+  p.answered=true;
+  p.sc=grade(p.cur,d.a);
+  const frac=Math.max(0,1-el/G.dur);
+  p.pts=p.sc>0?Math.round(p.sc*POINTS_PER_SCORE*(1+SPEED_BONUS*frac)):0;
+  send(p,{t:'answered'});
+  const act=connected();
+  render({t:'hcnt',answered:act.filter(x=>x.answered).length,total_teams:act.length});
+  checkAll();
+}
+function checkAll(){ if(G.phase==='q' && connected().every(p=>p.answered)) endRound(); }
+
+function hostStart(){
+  if(!G.players.size) return;
+  G.players.forEach(p=>{ p.o=[0,1,2,3].map(()=>shuffle([0,1,2])); p.score=0; p.raw=0; });
+  G.phase='play'; G.round=-1; nextRound();
+}
+function nextRound(){
+  G.round++;
+  const r=G.round, s=Math.floor(r/3), n=r%3+1, dur=SECTION_SECONDS[s];
+  G.phase='q'; G.start=now(); G.dur=dur;
+  const endAt=G.start+dur*1000+400;
+  G.players.forEach(p=>{
+    p.answered=false; p.pts=0; p.sc=0;
+    p.cur=POOL[s][p.o[s][n-1]];
+    send(p,{t:'q',round:r,sec:s+1,n,total:dur,endAt,view:makeView(p.cur)});
+  });
+  render({t:'hq',round:r,sec:s+1,n,total:dur,answered:0,total_teams:connected().length});
+  clearTimeout(G.timer);
+  G.timer=setTimeout(endRound,(dur+2.2)*1000);
+}
+function endRound(){
+  if(G.phase!=='q') return;
+  G.phase='reveal'; clearTimeout(G.timer);
+  G.players.forEach(p=>{ p.score+=p.pts; p.raw+=p.sc; });
+  const rk=rows();
+  G.players.forEach(p=>{
+    const max=p.cur.score;
+    const status=!p.answered?'skip':(p.sc>=max?'full':(p.sc>0?'part':'none'));
+    send(p,{t:'reveal',status,sc:p.sc,max,pts:p.pts,score:p.score,rank:rk.findIndex(x=>x.team===p.team)+1,fb:p.cur.fb});
+  });
+  const all=[...G.players.values()];
+  render({t:'hreveal',ok:all.filter(p=>p.answered&&p.sc>=p.cur.score).length,total:all.length});
+  G.timer=setTimeout(afterReveal,REVEAL_MS);
+}
+function afterReveal(){
+  const r=G.round;
+  if(r===11){ G.phase='end'; bcast({t:'board',rows:rows(),final:true}); return; }
+  if(r%3===2){
+    const s=Math.floor(r/3);
+    G.phase='board';
+    bcast({t:'board',rows:rows(),title:`Leaderboard Bagian ${s+1}`});
+    G.timer=setTimeout(()=>{
+      bcast({t:'trans',from:s,to:s+1});
+      G.timer=setTimeout(nextRound,4000);
+    },6000);
+    return;
+  }
+  nextRound();
+}
+function hostReset(){
+  clearTimeout(G.timer);
+  R('ans').remove();
+  G.rej=new Set();
+  [...G.players.entries()].forEach(([id,p])=>{
+    if(!p.connected){ G.players.delete(id); R('to/'+id).remove(); } else { p.score=0; p.raw=0; }
+  });
+  G.phase='lobby'; G.round=-1;
+  bcastLobby(true);
+}
+
+/* ===================== Tombol guru ===================== */
+const modal=document.getElementById('modal'), pw=document.getElementById('pw'), err=document.getElementById('err');
+document.getElementById('adminBtn').onclick=()=>{ if(role==='host') return; modal.style.display='flex'; pw.value=''; err.textContent=''; pw.focus(); };
+document.getElementById('pwNo').onclick=()=>modal.style.display='none';
+function tryPw(){
+  if(pw.value===ADMIN_PASSWORD){ modal.style.display='none'; becomeHost(false); }
+  else err.textContent='Katasandi salah';
+}
+document.getElementById('pwOk').onclick=tryPw;
+pw.addEventListener('keydown',e=>{ if(e.key==='Enter') tryPw(); });
+
+if(initFirebase()) startStudent();
+</script>
+</body>
+</html>
