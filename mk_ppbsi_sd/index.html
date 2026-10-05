@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Petualangan Jendela Dunia</title>
+<meta name="description" content="Media ajar digital Bahasa Indonesia Kelas V: Buku Jendela Dunia">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#f0156a; --pink-soft:#fde0ec; --blue:#3f7cb8; --blue-soft:#dcecfa;
+  --cream:#fff6e0; --yellow:#ffd25e; --purple:#6b3fa0; --purple-soft:#ece1f7;
+  --green:#2fb67c; --green-soft:#d9f5e8; --orange:#ff9a3d; --ink:#2d2540; --white:#fff;
+  --r:22px; --shadow:0 6px 0 rgba(45,37,64,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Nunito','Trebuchet MS',system-ui,sans-serif; color:var(--ink);
+  background:linear-gradient(180deg,#fff0f6 0%,var(--cream) 40%,#e9f4ff 100%) fixed;
+  font-size:18px; line-height:1.55; padding-bottom:96px; min-height:100vh;
+}
+h1,h2,h3,.fun{font-family:'Baloo 2','Comic Sans MS',system-ui,sans-serif; line-height:1.15}
+button{font-family:inherit; font-size:inherit; cursor:pointer; border:0; color:inherit}
+textarea,input[type=text]{font-family:inherit; font-size:1rem; width:100%; padding:12px 14px; border:3px solid #e4d7f2; border-radius:16px; background:#fff; color:var(--ink)}
+textarea{min-height:90px; resize:vertical}
+textarea:focus,input:focus,button:focus-visible{outline:4px solid var(--yellow); outline-offset:2px}
+label{font-weight:700; display:block; margin:12px 0 4px}
+
+/* doodles */
+.doodles{position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden}
+.doodles span{position:absolute; font-size:2rem; opacity:.25; animation:float 7s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-18px) rotate(6deg)}}
+
+/* header */
+header{position:sticky; top:0; z-index:20; background:var(--pink); color:#fff; padding:10px 16px; display:flex; align-items:center; gap:12px; box-shadow:0 4px 0 rgba(0,0,0,.12)}
+header .logo{font-size:1.9rem}
+header h1{font-size:1.25rem; flex:1}
+header small{display:block; font-family:'Nunito'; font-weight:600; font-size:.75rem; opacity:.9}
+.chip{background:#fff; color:var(--pink); border-radius:999px; padding:4px 12px; font-weight:800; font-size:.9rem; white-space:nowrap}
+
+main{position:relative; z-index:1; max-width:920px; margin:0 auto; padding:18px 14px}
+.view{display:none; animation:pop .35s ease}
+.view.active{display:block}
+@keyframes pop{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
+
+.card{background:#fff; border-radius:var(--r); padding:20px; margin:16px 0; box-shadow:var(--shadow); border:3px solid #fff}
+.card.pink{background:var(--pink-soft)} .card.blue{background:var(--blue-soft)} .card.yellow{background:#fff0c2} .card.green{background:var(--green-soft)} .card.purple{background:var(--purple-soft)}
+.card h2{color:var(--pink); font-size:1.5rem; margin-bottom:6px}
+.card h3{color:var(--blue); font-size:1.2rem; margin-bottom:6px}
+.pill{display:inline-block; background:var(--blue); color:#fff; border-radius:999px; padding:4px 14px; font-family:'Baloo 2'; font-weight:700; font-size:.95rem; margin-bottom:8px}
+.pill.pk{background:var(--pink)} .pill.gr{background:var(--green)} .pill.pu{background:var(--purple)}
+
+.btn{display:inline-flex; align-items:center; gap:8px; background:var(--pink); color:#fff; font-weight:800; padding:12px 22px; border-radius:999px; box-shadow:0 5px 0 #b30e4f; transition:transform .1s; margin:6px 6px 6px 0}
+.btn:active{transform:translateY(4px); box-shadow:0 1px 0 #b30e4f}
+.btn.blue{background:var(--blue); box-shadow:0 5px 0 #2a5a8a}
+.btn.green{background:var(--green); box-shadow:0 5px 0 #1d8458}
+.btn.yellow{background:var(--yellow); color:var(--ink); box-shadow:0 5px 0 #c9a02b}
+.btn.ghost{background:#fff; color:var(--pink); box-shadow:0 5px 0 #f3b3cd; border:3px solid var(--pink)}
+.btn[disabled]{opacity:.45; pointer-events:none}
+
+/* hero */
+.hero{display:flex; gap:16px; align-items:center; flex-wrap:wrap; background:linear-gradient(135deg,#ff5c9d,#f0156a); color:#fff; border-radius:30px; padding:24px; box-shadow:var(--shadow)}
+.hero .mascot{font-size:5rem; animation:float 4s ease-in-out infinite}
+.hero h2{font-size:2rem; color:#fff}
+.hero p{font-weight:600}
+.hero input{margin-top:10px; border-color:#fff}
+.question{background:#fff; color:var(--pink); border-radius:16px; padding:10px 16px; font-weight:800; margin-top:12px; display:inline-block}
+
+.map{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.island{border-radius:26px; padding:18px; text-align:left; background:#fff; box-shadow:var(--shadow); position:relative; border:4px solid transparent; transition:transform .15s}
+.island:hover{transform:translateY(-4px) rotate(-1deg)}
+.island .em{font-size:3rem; display:block}
+.island b{font-family:'Baloo 2'; font-size:1.25rem; display:block}
+.island span.d{font-size:.95rem; opacity:.85; display:block}
+.island.i1{background:var(--pink-soft); border-color:var(--pink)}
+.island.i2{background:var(--blue-soft); border-color:var(--blue)}
+.island.i3{background:var(--green-soft); border-color:var(--green)}
+.island.i4{background:#fff0c2; border-color:var(--orange)}
+.island.i5{background:var(--purple-soft); border-color:var(--purple)}
+.island .tick{position:absolute; top:10px; right:12px; font-size:1.8rem; display:none}
+.island.done .tick{display:block}
+
+.progress{height:22px; background:#fff; border-radius:999px; overflow:hidden; border:3px solid #fff; box-shadow:inset 0 2px 4px rgba(0,0,0,.15)}
+.progress i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--yellow),var(--orange)); border-radius:999px; transition:width .6s}
+.badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+.badge{width:78px; text-align:center; font-size:.72rem; font-weight:800; line-height:1.15; filter:grayscale(1); opacity:.45; transition:.4s}
+.badge .b{font-size:2.3rem; display:block; background:#fff; border-radius:50%; width:62px; height:62px; line-height:62px; margin:0 auto 4px; box-shadow:var(--shadow)}
+.badge.got{filter:none; opacity:1; animation:pop .5s}
+
+/* mascot tip */
+.tip{display:flex; gap:12px; align-items:flex-start; background:#fff8dc; border:3px dashed var(--yellow); border-radius:20px; padding:12px 16px; margin:12px 0}
+.tip .m{font-size:2.4rem}
+
+/* comic */
+.comic{background:var(--cream); border-radius:24px; padding:20px; text-align:center; border:4px solid var(--yellow); min-height:250px; display:flex; flex-direction:column; justify-content:center; gap:10px}
+.comic .big{font-size:5rem}
+.comic p{font-size:1.15rem; font-weight:600}
+.dots{display:flex; gap:6px; justify-content:center; margin:8px 0}
+.dots i{width:12px; height:12px; border-radius:50%; background:#e2d6ef}
+.dots i.on{background:var(--pink)}
+
+/* quiz */
+.stmt{display:flex; gap:12px; align-items:flex-start; background:#fff; border:3px solid #eee; border-radius:16px; padding:10px 14px; margin:8px 0; font-weight:600}
+.stmt input{width:26px; height:26px; margin-top:3px; accent-color:var(--pink); flex:none}
+.stmt.ok{background:var(--green-soft); border-color:var(--green)}
+.stmt.bad{background:#ffe3e3; border-color:#e5484d}
+.stmt small{display:block; font-weight:600; opacity:.8}
+.msg{margin-top:10px; font-weight:800; min-height:1.5em}
+
+.benefits{display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.benefit{background:#fff; border-radius:18px; padding:12px 14px; font-weight:700; font-size:.95rem; display:flex; gap:10px; align-items:center; border:3px solid var(--pink-soft)}
+.benefit span{font-size:1.8rem}
+
+/* order + match */
+.pool,.slots{display:flex; flex-wrap:wrap; gap:10px; margin:10px 0}
+.opt{background:#fff; border:3px solid var(--blue); color:var(--ink); border-radius:16px; padding:10px 14px; font-weight:700; text-align:left; box-shadow:0 4px 0 #b9d3ec; flex:1 1 240px}
+.opt:active{transform:translateY(3px)}
+.opt.ok{background:var(--green-soft); border-color:var(--green); box-shadow:0 4px 0 #9cdcc0; pointer-events:none}
+.opt.sel{background:#fff0c2; border-color:var(--orange)}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+ol.timeline{list-style:none; counter-reset:s; margin:10px 0}
+ol.timeline li{counter-increment:s; background:var(--green-soft); border:3px solid var(--green); border-radius:16px; padding:10px 14px 10px 54px; margin:8px 0; position:relative; font-weight:700; animation:pop .3s}
+ol.timeline li::before{content:counter(s); position:absolute; left:10px; top:50%; transform:translateY(-50%); width:32px; height:32px; line-height:32px; text-align:center; border-radius:50%; background:var(--green); color:#fff; font-family:'Baloo 2'}
+.cols{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.cols .opt{flex:none}
+@media(max-width:560px){ .cols{grid-template-columns:1fr} }
+.sub{float:right; font-size:1.6rem}
+
+.q{background:#fff; border-radius:18px; padding:14px; margin:10px 0; border:3px solid var(--blue-soft)}
+.q .qt{font-weight:800; margin-bottom:8px}
+.q .why{display:none; margin-top:8px; font-weight:600; color:#1d8458}
+.q.done .why{display:block}
+.q .row{display:flex; flex-wrap:wrap; gap:8px}
+.q .row .opt{flex:1 1 140px; text-align:center}
+
+/* reading */
+.text{background:#fff; border-radius:18px; padding:16px; font-size:1.15rem; line-height:2; border:3px solid var(--green-soft)}
+.w{cursor:pointer; border-radius:8px; padding:1px 2px; transition:.15s}
+.w:hover{background:#fff0c2}
+.w.hard{background:var(--yellow); box-shadow:0 2px 0 #c9a02b}
+.kamus{margin-top:10px; background:var(--purple-soft); border-radius:16px; padding:10px 14px; font-weight:700; min-height:48px}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+.chips span{background:var(--yellow); border-radius:999px; padding:2px 12px; font-weight:800; font-size:.9rem}
+.steps label{display:flex; gap:12px; align-items:center; background:#fff; border:3px solid var(--green-soft); border-radius:16px; padding:10px 14px; margin:8px 0; font-weight:700; cursor:pointer}
+.steps input{width:26px; height:26px; accent-color:var(--green); flex:none}
+.steps b{background:var(--green); color:#fff; border-radius:50%; width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; flex:none; font-family:'Baloo 2'}
+.shelf{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.shelf a{display:block; text-decoration:none; color:var(--ink); background:#fff; border-radius:18px; padding:14px; border:3px solid var(--blue-soft); font-weight:700; box-shadow:var(--shadow)}
+.shelf a span{font-size:2.4rem; display:block}
+.shelf a small{display:block; font-weight:600; opacity:.75}
+
+/* book cover + presentation card */
+.cover{border-radius:18px; padding:20px; color:#fff; text-align:center; min-height:230px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:8px; box-shadow:var(--shadow); border:5px solid rgba(255,255,255,.6)}
+.cover .e{font-size:3.6rem}
+.cover h3{color:#fff; font-size:1.7rem}
+.cover p{font-weight:600; font-size:.95rem}
+.swatch{display:flex; gap:8px; flex-wrap:wrap; margin:6px 0}
+.swatch button{width:44px; height:44px; border-radius:50%; border:4px solid #fff; box-shadow:0 2px 0 rgba(0,0,0,.25); font-size:1.3rem; background:#fff}
+.swatch button.sel{outline:4px solid var(--ink)}
+.two{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+@media(max-width:700px){ .two{grid-template-columns:1fr} }
+.pcard{background:#fff; border:5px solid var(--purple); border-radius:20px; padding:16px; box-shadow:var(--shadow)}
+.pcard h3{color:var(--purple); font-size:1.5rem}
+.pcard dt{font-weight:800; color:var(--pink); margin-top:8px; font-size:.9rem}
+.pcard dd{font-weight:600; min-height:1.2em; white-space:pre-wrap}
+.rubric .r{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; background:#fff; border-radius:14px; padding:8px 12px; margin:6px 0; font-weight:700}
+.face button{background:#f5f0fa; border-radius:12px; font-size:1.6rem; padding:2px 10px; margin-left:4px; filter:grayscale(1); opacity:.6}
+.face button.sel{filter:none; opacity:1; background:var(--yellow)}
+
+/* reflection */
+.refl .r{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; background:#fff; border-radius:14px; padding:10px 14px; margin:6px 0; font-weight:700}
+.refl .tg button{background:#f5f0fa; border-radius:999px; padding:6px 14px; font-weight:800; margin-left:4px; font-size:.9rem}
+.refl .tg button.sel.yes{background:var(--green); color:#fff}
+.refl .tg button.sel.no{background:var(--orange); color:#fff}
+
+details{background:#fff; border-radius:16px; padding:12px 16px; margin:10px 0; border:3px solid var(--blue-soft)}
+summary{font-weight:800; cursor:pointer; color:var(--blue)}
+details ul,details ol{margin:8px 0 0 22px; font-size:.95rem}
+table{border-collapse:collapse; width:100%; font-size:.9rem; margin-top:8px}
+td,th{border:2px solid var(--blue-soft); padding:6px 8px; text-align:left; vertical-align:top}
+th{background:var(--blue-soft)}
+
+/* nav */
+nav.tabs{position:fixed; left:0; right:0; bottom:0; z-index:30; background:#fff; display:flex; justify-content:space-around; padding:6px 4px calc(6px + env(safe-area-inset-bottom)); box-shadow:0 -4px 0 rgba(0,0,0,.08); border-radius:22px 22px 0 0}
+.tab{background:none; display:flex; flex-direction:column; align-items:center; font-weight:800; font-size:.68rem; padding:4px 8px; border-radius:14px; color:#7a6e90; min-width:56px}
+.tab span{font-size:1.6rem}
+.tab.on{background:var(--pink-soft); color:var(--pink)}
+
+#toast{position:fixed; left:50%; bottom:110px; transform:translateX(-50%) translateY(30px); background:var(--ink); color:#fff; padding:12px 20px; border-radius:999px; font-weight:800; z-index:60; opacity:0; transition:.3s; max-width:90vw; text-align:center}
+#toast.show{opacity:1; transform:translateX(-50%)}
+.modal{position:fixed; inset:0; background:rgba(45,37,64,.7); z-index:70; display:none; align-items:center; justify-content:center; padding:20px}
+.modal.show{display:flex}
+.modal .box{background:#fff; border-radius:30px; padding:28px; max-width:460px; text-align:center; animation:pop .5s; border:6px solid var(--yellow)}
+.modal h2{color:var(--pink); font-size:2rem}
+.confetti{position:fixed; top:-40px; z-index:80; font-size:1.8rem; animation:fall linear forwards; pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity:.75; padding:10px 20px 0}
+
+@media(prefers-reduced-motion:reduce){ *{animation:none!important; transition:none!important} }
+@media print{
+  header,nav.tabs,.no-print,.doodles,footer,#toast{display:none!important}
+  body{background:#fff; padding:0}
+  .view{display:none!important} #panggung{display:block!important}
+  .card{box-shadow:none; border:0}
+}
+</style>
+</head>
+<body>
+
+<div class="doodles" aria-hidden="true">
+  <span style="left:6%;top:14%">⭐</span><span style="left:88%;top:20%;animation-delay:1s">📚</span>
+  <span style="left:12%;top:62%;animation-delay:2s">☁️</span><span style="left:80%;top:68%;animation-delay:.5s">✏️</span>
+  <span style="left:46%;top:88%;animation-delay:1.5s">🌈</span><span style="left:92%;top:44%;animation-delay:2.5s">🎈</span>
+</div>
+
+<header>
+  <div class="logo">📖</div>
+  <h1>Petualangan Jendela Dunia<small>Bahasa Indonesia • Kelas V • Bab 2</small></h1>
+  <div class="chip" id="chipProg">⭐ 0/5</div>
+</header>
+
+<main>
+
+<!-- ============ PETA ============ -->
+<section class="view active" id="peta">
+  <div class="hero">
+    <div class="mascot" aria-hidden="true">🦉</div>
+    <div style="flex:1; min-width:220px">
+      <h2>Halo, Petualang Buku!</h2>
+      <p>Aku Kiko. Ayo jelajahi tiga pulau, kumpulkan lima lencana, lalu tampil di Panggung Presentasi!</p>
+      <div class="question">❓ Mengapa membaca itu penting?</div>
+      <input type="text" id="nama" class="keep" placeholder="Tulis namamu di sini ✍️" maxlength="30" aria-label="Nama petualang">
+    </div>
+  </div>
+
+  <div class="card yellow">
+    <h2>🎯 Tujuan Kita</h2>
+    <p>Kita akan belajar <b>memahami bacaan</b> dan <b>mempresentasikan buku yang kita suka</b>.</p>
+    <div class="progress" style="margin-top:12px" aria-label="Kemajuan"><i id="bar"></i></div>
+    <div class="badges" id="badges"></div>
+  </div>
+
+  <h2 class="fun" style="margin:18px 4px 4px; color:var(--pink)">🗺️ Peta Petualangan</h2>
+  <div class="map">
+    <button class="island i1" data-go="m1"><span class="tick">✅</span><span class="em">📮</span><b>Misi 1: Pulau Kotak Baca</b><span class="d">Kartini dan buku. Temukan informasi dari bacaan.</span></button>
+    <button class="island i2" data-go="m2"><span class="tick">✅</span><span class="em">🏭</span><b>Misi 2: Pulau Penerbitan</b><span class="d">Bagaimana buku dibuat? Kenali majas metafora.</span></button>
+    <button class="island i3" data-go="m3"><span class="tick">✅</span><span class="em">🔍</span><b>Misi 3: Pulau Detektif Bacaan</b><span class="d">Lima langkah memahami bacaan yang sulit.</span></button>
+    <button class="island i4" data-go="panggung"><span class="tick">✅</span><span class="em">🎤</span><b>Panggung Presentasi</b><span class="d">Ceritakan buku favoritmu!</span></button>
+    <button class="island i5" data-go="refleksi"><span class="tick">✅</span><span class="em">🌟</span><b>Pulau Refleksi</b><span class="d">Lihat kembali perjalanan belajarmu.</span></button>
+  </div>
+
+  <div style="text-align:center; margin-top:18px">
+    <button class="btn ghost" data-go="guru">👩‍🏫 Panduan Guru</button>
+  </div>
+</section>
+
+<!-- ============ MISI 1 ============ -->
+<section class="view" id="m1">
+  <div class="card pink">
+    <span class="pill pk">Misi 1</span>
+    <h2>📮 Pulau Kotak Baca: Kartini dan Buku</h2>
+    <div class="tip"><div class="m">🦉</div><div>Baca komik pendek ini. Tekan <b>🔊 Dengarkan</b> kalau mau dibacakan!</div></div>
+    <div class="comic" id="comic"></div>
+    <div class="dots" id="dots"></div>
+    <div style="text-align:center">
+      <button class="btn blue" id="cPrev">⬅️ Sebelumnya</button>
+      <button class="btn yellow" id="cSpeak">🔊 Dengarkan</button>
+      <button class="btn" id="cNext">Lanjut ➡️</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="pill">Aktivitas 1</span>
+    <h2>🕵️ Temukan Informasinya</h2>
+    <p>Centang pernyataan yang <b>benar</b> menurut bacaan "Kotak Baca Kartini" dan "Kartini dan Ayahnya". Hati-hati, ada yang salah!</p>
+    <div id="stmts"></div>
+    <button class="btn green" id="stmtCheck">✅ Periksa Jawabanku</button>
+    <div class="msg" id="stmtMsg"></div>
+  </div>
+
+  <div class="card blue">
+    <span class="pill">Tahukah kamu?</span>
+    <h2>💪 Kelebihan Orang yang Suka Membaca</h2>
+    <div class="benefits" id="benefits"></div>
+    <p style="margin-top:12px; font-weight:700">Manfaat lain apa yang kamu rasakan dari membaca?</p>
+    <textarea class="keep" id="m1-manfaat" placeholder="Tulis manfaat membaca menurutmu…"></textarea>
+  </div>
+
+  <div class="card purple">
+    <span class="pill pu">Berdiskusi</span>
+    <h2>💬 Ayo Berdiskusi</h2>
+    <p>Seandainya Kartini tidak suka membaca buku, masihkah dia bercita-cita mendirikan sekolah? Apa yang membuat pembaca buku punya gagasan hebat?</p>
+    <textarea class="keep" id="m1-diskusi" placeholder="Tulis pendapatmu, lalu diskusikan dengan temanmu…"></textarea>
+    <span class="pill pk" style="margin-top:14px">Berimajinasi</span>
+    <p>Bayangkan kamu hidup di zaman Kartini. Hanya kamu yang bisa membaca, menulis, dan punya banyak buku. Apa yang akan kamu lakukan?</p>
+    <textarea class="keep" id="m1-imajinasi" placeholder="Tulis imajinasimu secara singkat…"></textarea>
+    <p style="margin-top:8px; font-weight:700">🎨 Setelah menulis, gambar dirimu di zaman itu di buku gambarmu ya!</p>
+  </div>
+</section>
+
+<!-- ============ MISI 2 ============ -->
+<section class="view" id="m2">
+  <div class="card blue">
+    <span class="pill">Misi 2</span>
+    <h2>🏭 Pulau Penerbitan: Bagaimana Buku Dibuat?</h2>
+    <div class="tip"><div class="m">🦉</div><div>Buku bagus dibuat lewat proses panjang. Selesaikan <b>tiga tantangan</b> di bawah, lalu buat buku impianmu!</div></div>
+  </div>
+
+  <div class="card">
+    <span class="sub" id="s-order"></span>
+    <span class="pill">Tantangan A</span>
+    <h2>🔢 Urutkan Proses Pembuatan Buku</h2>
+    <p>Tekan langkah dengan urutan yang <b>benar</b>, mulai dari langkah pertama.</p>
+    <div class="msg" id="orderMsg">Langkah ke-1 apa ya?</div>
+    <ol class="timeline" id="slots"></ol>
+    <div class="pool" id="pool"></div>
+  </div>
+
+  <div class="card">
+    <span class="sub" id="s-match"></span>
+    <span class="pill">Tantangan B</span>
+    <h2>🧩 Pasangkan Pekerjaan dan Tugasnya</h2>
+    <p>Tekan satu <b>pekerjaan</b> di kiri, lalu tekan <b>tugasnya</b> di kanan.</p>
+    <div class="cols"><div id="mTerms"></div><div id="mDefs"></div></div>
+    <div class="msg" id="matchMsg"></div>
+  </div>
+
+  <div class="card">
+    <span class="sub" id="s-majas"></span>
+    <span class="pill gr">Tantangan C</span>
+    <h2>🔎 Pemburu Majas Metafora</h2>
+    <p>Majas metafora adalah kata atau kelompok kata yang <b>tidak berarti sebenarnya</b>. Pilih bagian kalimat yang berupa metafora!</p>
+    <div id="majas"></div>
+    <label for="m2-kalimat">✍️ Buat kalimatmu sendiri dengan kata <b>keras hati</b>:</label>
+    <textarea class="keep" id="m2-kalimat" placeholder="Contoh: Sabai membangun rumah singgah untuk kucing jalanan dengan keras hati."></textarea>
+  </div>
+
+  <div class="card yellow">
+    <span class="pill pk">Aktivitas 4</span>
+    <h2>📚 Studio Buku Impianku</h2>
+    <p>Kalau kamu jadi penulis, buku apa yang ingin kamu tulis?</p>
+    <div class="two">
+      <div>
+        <label for="bi-judul">Judul buku</label>
+        <input type="text" id="bi-judul" class="keep" placeholder="Contoh: Berlayar ke Lembata" maxlength="40">
+        <label for="bi-isi">Isi cerita</label>
+        <textarea id="bi-isi" class="keep" placeholder="Buku ini bercerita tentang…"></textarea>
+        <label for="bi-alasan">Alasan ingin menulis</label>
+        <textarea id="bi-alasan" class="keep" placeholder="Karena aku penasaran dengan…"></textarea>
+        <label>Pilih warna dan gambar sampul</label>
+        <div class="swatch" id="bi-colors"></div>
+        <div class="swatch" id="bi-emojis"></div>
+      </div>
+      <div>
+        <div class="cover" id="cover"><div class="e">📖</div><h3 id="cv-judul">Judul Bukuku</h3><p id="cv-isi">Isi cerita akan tampil di sini.</p><p id="cv-by"></p></div>
+        <p style="margin-top:8px; font-size:.9rem; font-weight:700">Alasan: <span id="cv-alasan">…</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MISI 3 ============ -->
+<section class="view" id="m3">
+  <div class="card green">
+    <span class="pill gr">Misi 3</span>
+    <h2>🔍 Pulau Detektif Bacaan</h2>
+    <div class="tip"><div class="m">🦉</div><div>Kadang bacaan terasa sulit. Jadilah detektif! Tandai kata sulit dengan <b>menekan katanya</b>.</div></div>
+  </div>
+
+  <div class="card">
+    <span class="pill gr">Langkah 1 dan 2</span>
+    <h2>🖍️ Tandai Kata yang Sulit</h2>
+    <p>Baca tulisan tentang ikan di hutan mangrove ini. Tekan kata yang menurutmu sulit.</p>
+    <div class="text" id="teks"></div>
+    <div class="kamus" id="kamus">📖 Kamus Kiko: tekan sebuah kata untuk melihat artinya.</div>
+    <div style="margin-top:8px; font-weight:800">Kata sulitku:</div>
+    <div class="chips" id="hardList"><em style="opacity:.6">belum ada</em></div>
+    <button class="btn yellow" id="tSpeak" style="margin-top:10px">🔊 Bacakan Teks</button>
+  </div>
+
+  <div class="card">
+    <span class="pill gr">Langkah 3</span>
+    <h2>📓 Jurnal Detektif</h2>
+    <p>Catat informasi yang menarik menurutmu.</p>
+    <textarea class="keep" id="m3-jurnal" placeholder="Informasi menarik yang kutemukan…"></textarea>
+  </div>
+
+  <div class="card">
+    <span class="pill gr">Langkah 4</span>
+    <h2>🐟 Uji Pemahamanmu</h2>
+    <div id="m3q"></div>
+  </div>
+
+  <div class="card green steps">
+    <span class="sub" id="s-steps"></span>
+    <span class="pill gr">Rangkuman</span>
+    <h2>✅ Lima Langkah Memahami Bacaan</h2>
+    <p>Centang kalau kamu sudah mencobanya!</p>
+    <label><input type="checkbox" class="stp"><b>1</b>Pikirkan bagian mana yang menyulitkan: kata, kalimat, atau cerita.</label>
+    <label><input type="checkbox" class="stp"><b>2</b>Tandai kata dan kalimat sulit, lalu cari arti di kamus.</label>
+    <label><input type="checkbox" class="stp"><b>3</b>Catat informasi menarik di jurnalmu.</label>
+    <label><input type="checkbox" class="stp"><b>4</b>Perhatikan gambar, gambar bisa membantu menjelaskan.</label>
+    <label><input type="checkbox" class="stp"><b>5</b>Berdiskusi dengan teman, guru, atau orang tua.</label>
+  </div>
+
+  <div class="card blue">
+    <span class="pill">Rak Buku</span>
+    <h2>📚 Perpustakaan Digital Kemdikbud</h2>
+    <p>Pilih buku yang kamu suka. Buku bisa dibaca gratis lewat tautan ini.</p>
+    <div class="shelf">
+      <a href="https://buku.kemdikbud.go.id/katalog/apa-itu" target="_blank" rel="noopener"><span>🖼️</span>Cerita bergambar<small>Gambar lebih banyak dari tulisan</small></a>
+      <a href="https://buku.kemdikbud.go.id/katalog/coba-dulu-tora" target="_blank" rel="noopener"><span>🐒</span>Cerita bergambar<small>Gambar dan tulisan seimbang</small></a>
+      <a href="https://buku.kemdikbud.go.id/katalog/misteri-drumben-tengah-malam" target="_blank" rel="noopener"><span>🥁</span>Novel bergambar<small>Tulisan lebih banyak</small></a>
+      <a href="https://buku.kemdikbud.go.id/katalog/kesatria-penjaga" target="_blank" rel="noopener"><span>🐦</span>Buku nonfiksi<small>Pengetahuan tentang alam</small></a>
+      <a href="https://buku.kemdikbud.go.id/katalog/si-cemong-coak" target="_blank" rel="noopener"><span>🐈‍⬛</span>Si Cemong Coak<small>Petualangan kucing jalanan</small></a>
+      <a href="https://buku.kemdikbud.go.id/katalog/sagu-pertama-maria" target="_blank" rel="noopener"><span>🌴</span>Sagu Pertama Maria<small>Kisah dari Merauke</small></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PANGGUNG ============ -->
+<section class="view" id="panggung">
+  <div class="card purple no-print">
+    <span class="pill pu">Aktivitas 7</span>
+    <h2>🎤 Panggung Presentasi Buku</h2>
+    <div class="tip"><div class="m">🦉</div><div>Pilih satu buku yang sudah kamu baca. Isi kartu ini, lalu ceritakan di depan kelas!</div></div>
+  </div>
+
+  <div class="two">
+    <div class="card no-print">
+      <label for="pk-judul">📕 Judul buku</label><input type="text" id="pk-judul" class="keep" maxlength="50">
+      <label for="pk-penulis">✍️ Penulis</label><input type="text" id="pk-penulis" class="keep" maxlength="40">
+      <label for="pk-isi">📖 Isi buku (ceritakan singkat)</label><textarea id="pk-isi" class="keep"></textarea>
+      <label for="pk-tokoh">🧒 Tokoh yang kusuka dan alasannya</label><textarea id="pk-tokoh" class="keep"></textarea>
+      <label for="pk-pendapat">💭 Pendapatku tentang buku ini</label><textarea id="pk-pendapat" class="keep"></textarea>
+      <label for="pk-saran">💡 Saranku untuk penulis</label><textarea id="pk-saran" class="keep" placeholder="Mau ada kelanjutan cerita? Peristiwa apa yang perlu ditambah?"></textarea>
+    </div>
+    <div>
+      <div class="card" style="padding:0; background:none; box-shadow:none">
+        <div class="pcard" id="pcard">
+          <h3 id="pv-judul">Judul Buku</h3>
+          <div style="font-weight:700" id="pv-penulis">oleh …</div>
+          <dl>
+            <dt>📖 ISI BUKU</dt><dd id="pv-isi"></dd>
+            <dt>🧒 TOKOH FAVORIT</dt><dd id="pv-tokoh"></dd>
+            <dt>💭 PENDAPATKU</dt><dd id="pv-pendapat"></dd>
+            <dt>💡 SARANKU UNTUK PENULIS</dt><dd id="pv-saran"></dd>
+          </dl>
+          <div style="margin-top:10px; font-size:.8rem; opacity:.7" id="pv-by"></div>
+        </div>
+      </div>
+      <div class="no-print" style="margin-top:10px">
+        <button class="btn yellow" id="pSpeak">🔊 Bacakan Kartu</button>
+        <button class="btn blue" id="pPrint">🖨️ Cetak Kartu</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card yellow rubric no-print">
+    <span class="sub" id="s-rubric"></span>
+    <h2>⭐ Penilaian Diri Setelah Presentasi</h2>
+    <div class="r">Suaraku terdengar jelas<span class="face" data-k="a"><button>😟</button><button>😐</button><button>😄</button></span></div>
+    <div class="r">Aku menceritakan isi buku dengan runtut<span class="face" data-k="b"><button>😟</button><button>😐</button><button>😄</button></span></div>
+    <div class="r">Aku menyebut tokoh favorit dan alasannya<span class="face" data-k="c"><button>😟</button><button>😐</button><button>😄</button></span></div>
+    <div class="r">Aku berani menyampaikan pendapat dan saran<span class="face" data-k="d"><button>😟</button><button>😐</button><button>😄</button></span></div>
+    <button class="btn green" id="pDone" style="margin-top:10px">🎉 Aku Sudah Presentasi!</button>
+  </div>
+</section>
+
+<!-- ============ REFLEKSI ============ -->
+<section class="view" id="refleksi">
+  <div class="card pink refl">
+    <span class="pill pk">Refleksi</span>
+    <h2>🌟 Perjalanan Belajarku</h2>
+    <p>Kita sudah sampai di akhir Bab Buku Jendela Dunia. Bagaimana perjalananmu?</p>
+    <div class="r">Aku dapat menjelaskan pentingnya bacaan dalam hidup Kartini<span class="tg" data-k="1"><button class="yes">😊 Sudah bisa</button><button class="no">🌱 Masih belajar</button></span></div>
+    <div class="r">Aku memahami manfaat membaca dan majas metafora<span class="tg" data-k="2"><button class="yes">😊 Sudah bisa</button><button class="no">🌱 Masih belajar</button></span></div>
+    <div class="r">Aku memahami proses membuat buku<span class="tg" data-k="3"><button class="yes">😊 Sudah bisa</button><button class="no">🌱 Masih belajar</button></span></div>
+    <div class="r">Aku dapat menjelaskan isi buku yang kubaca<span class="tg" data-k="4"><button class="yes">😊 Sudah bisa</button><button class="no">🌱 Masih belajar</button></span></div>
+    <div class="r">Aku menerapkan langkah memahami bacaan<span class="tg" data-k="5"><button class="yes">😊 Sudah bisa</button><button class="no">🌱 Masih belajar</button></span></div>
+    <label for="rf1">Hal yang paling menyenangkan dari bab ini adalah …</label><textarea id="rf1" class="keep" style="min-height:60px"></textarea>
+    <label for="rf2">Bagian yang paling menantang adalah …</label><textarea id="rf2" class="keep" style="min-height:60px"></textarea>
+    <label for="rf3">Bab Buku Jendela Dunia mengajarkanku tentang …</label><textarea id="rf3" class="keep" style="min-height:60px"></textarea>
+    <button class="btn green" id="rDone" style="margin-top:12px">💾 Simpan Refleksiku</button>
+  </div>
+</section>
+
+<!-- ============ GURU ============ -->
+<section class="view" id="guru">
+  <div class="card">
+    <span class="pill">Untuk Guru</span>
+    <h2>👩‍🏫 Panduan Guru</h2>
+    <p>Media ini dirancang untuk mendampingi Bab 2 <i>Buku Jendela Dunia</i>, Bahasa Indonesia Kelas V (Kemendikbudristek, 2024). Data siswa hanya tersimpan di perangkat masing-masing (tanpa akun dan tanpa server).</p>
+    <details open><summary>🎯 Tujuan Pembelajaran</summary>
+      <p>Siswa dapat menerapkan langkah memahami bacaan dan mempresentasikan buku yang mereka sukai.</p></details>
+    <details><summary>🗺️ Alur Kegiatan yang Disarankan</summary>
+      <table>
+        <tr><th>Pertemuan</th><th>Kegiatan</th><th>Keterampilan</th></tr>
+        <tr><td>1</td><td>Misi 1: komik Kartini, Aktivitas 1, diskusi dan imajinasi</td><td>Membaca, memirsa, menulis, berbicara</td></tr>
+        <tr><td>2</td><td>Misi 2 tantangan A dan B: proses pembuatan buku dan kosakata</td><td>Membaca, kosakata</td></tr>
+        <tr><td>3</td><td>Misi 2 tantangan C dan Studio Buku Impianku: majas metafora</td><td>Menulis kreatif</td></tr>
+        <tr><td>4</td><td>Misi 3: lima langkah memahami bacaan, memilih buku</td><td>Membaca pemahaman</td></tr>
+        <tr><td>5</td><td>Panggung Presentasi dan Refleksi</td><td>Berbicara, menyimak, refleksi</td></tr>
+      </table></details>
+    <details><summary>🔑 Kunci Jawaban</summary>
+      <ul>
+        <li><b>Aktivitas 1:</b> pernyataan 1 sampai 6 benar. Dua pernyataan pengecoh (lahir 1900; jadi bersekolah ke Belanda) salah.</li>
+        <li><b>Urutan proses:</b> penulis menulis ide; kirim ke penerbit dan dibaca editor; rapat redaksi; catatan editor dan revisi; korektor bahasa; pengarah visual dan ilustrator; desainer menata halaman; cetak; pemasaran.</li>
+        <li><b>Majas:</b> keras hati; pipi ranum tomat; jendela dunia; naik darah.</li>
+        <li><b>Teks ikan mangrove:</b> ikan pengunjung masuk saat air pasang; ikan sembilang adalah penetap sementara.</li>
+      </ul></details>
+    <details><summary>📝 Rubrik Presentasi Singkat</summary>
+      <table>
+        <tr><th>Aspek</th><th>Perlu bimbingan (1)</th><th>Berkembang (2)</th><th>Baik (3)</th></tr>
+        <tr><td>Isi buku</td><td>Belum runtut</td><td>Cukup runtut</td><td>Runtut dan jelas</td></tr>
+        <tr><td>Tokoh dan alasan</td><td>Hanya menyebut tokoh</td><td>Ada alasan sederhana</td><td>Alasan jelas dan sesuai cerita</td></tr>
+        <tr><td>Pendapat dan saran</td><td>Belum ada</td><td>Salah satu ada</td><td>Keduanya ada</td></tr>
+        <tr><td>Penyampaian</td><td>Suara kurang jelas</td><td>Cukup jelas</td><td>Jelas dan percaya diri</td></tr>
+      </table></details>
+    <details><summary>🌐 Cara Mengunggah ke GitHub Pages</summary>
+      <ol>
+        <li>Buat repositori baru di GitHub (publik).</li>
+        <li>Unggah file <code>index.html</code> ini ke repositori.</li>
+        <li>Buka <b>Settings → Pages</b>, pilih Branch <code>main</code> dan folder <code>/ (root)</code>, lalu Save.</li>
+        <li>Tunggu 1 sampai 2 menit. Tautan akan muncul di halaman yang sama. Buat QR code dari tautan itu untuk dibagikan ke siswa.</li>
+      </ol></details>
+    <p style="font-size:.85rem; margin-top:10px; opacity:.8">Catatan: ilustrasi memakai emoji. Jangan menyalin gambar komik atau ilustrasi dari buku teks tanpa izin; buat sendiri atau gunakan aset berlisensi bebas.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>Prototipe media ajar • Mengacu pada Bahasa Indonesia: Bergerak Bersama untuk SD/MI Kelas V (Edisi Revisi), Kemendikbudristek 2024</footer>
+
+<nav class="tabs" aria-label="Navigasi">
+  <button class="tab on" data-go="peta"><span>🗺️</span>Peta</button>
+  <button class="tab" data-go="m1"><span>📮</span>Misi 1</button>
+  <button class="tab" data-go="m2"><span>🏭</span>Misi 2</button>
+  <button class="tab" data-go="m3"><span>🔍</span>Misi 3</button>
+  <button class="tab" data-go="panggung"><span>🎤</span>Panggung</button>
+</nav>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<div class="modal" id="modal"><div class="box">
+  <div style="font-size:4rem">🏆</div>
+  <h2>Selamat, <span id="mName">Petualang</span>!</h2>
+  <p style="margin:10px 0 16px; font-weight:700">Kamu sudah mengumpulkan semua lencana dan menjadi <b>Petualang Buku</b>. Buku memang jendela dunia!</p>
+  <button class="btn" id="mClose">Yeay! 🎉</button>
+</div></div>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const KEY='jendela-dunia-v1';
+let S={done:{},txt:{},sub:{},refl:{},face:{}};
+try{const r=localStorage.getItem(KEY); if(r) S=Object.assign(S,JSON.parse(r));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function shuffle(a){a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function shake(el){el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');}
+let tt; function toast(m){const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2600);}
+
+/* ---------- suara ---------- */
+function speak(text){
+  if(!('speechSynthesis' in window)){toast('Perangkat ini belum mendukung suara 😢'); return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text); u.lang='id-ID'; u.rate=.9; speechSynthesis.speak(u);
+}
+function stopSpeak(){try{speechSynthesis.cancel();}catch(e){}}
+
+/* ---------- navigasi ---------- */
+function go(id){
+  if(!$('#'+id)) id='peta';
+  $$('.view').forEach(v=>v.classList.toggle('active',v.id===id));
+  $$('.tab').forEach(t=>t.classList.toggle('on',t.dataset.go===id));
+  window.scrollTo({top:0,behavior:'smooth'}); stopSpeak();
+  try{history.replaceState(null,'','#'+id);}catch(e){}
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]'); if(b) go(b.dataset.go);});
+
+/* ---------- lencana ---------- */
+const BADGES=[['m1','📮','Kotak Baca'],['m2','🏭','Penerbit'],['m3','🔍','Detektif'],['p','🎤','Presenter'],['r','🌟','Refleksi']];
+const ISL={m1:0,m2:1,m3:2,p:3,r:4};
+function renderBadges(){
+  $('#badges').innerHTML=BADGES.map(b=>`<div class="badge ${S.done[b[0]]?'got':''}"><span class="b">${b[1]}</span>${b[2]}</div>`).join('');
+  const n=BADGES.filter(b=>S.done[b[0]]).length;
+  $('#bar').style.width=(n*20)+'%'; $('#chipProg').textContent='⭐ '+n+'/5';
+  $$('.island').forEach((el,i)=>el.classList.toggle('done',!!S.done[BADGES[i][0]]));
+}
+function confetti(){
+  const em=['🎉','⭐','📚','🌈','✨','🎈','💖'];
+  for(let i=0;i<45;i++){const s=document.createElement('span'); s.className='confetti'; s.textContent=em[i%em.length];
+    s.style.left=Math.random()*100+'vw'; s.style.animationDuration=(2.5+Math.random()*2.5)+'s'; s.style.animationDelay=(Math.random()*.8)+'s';
+    document.body.appendChild(s); setTimeout(()=>s.remove(),6000);}
+}
+function done(k){
+  if(S.done[k]) return;
+  S.done[k]=true; save(); renderBadges(); confetti();
+  const b=BADGES.find(x=>x[0]===k); toast('Lencana '+b[2]+' didapat! '+b[1]);
+  if(BADGES.every(x=>S.done[x[0]])){
+    setTimeout(()=>{$('#mName').textContent=($('#nama').value||'Petualang'); $('#modal').classList.add('show'); confetti();},1400);
+  }
+}
+$('#mClose').onclick=()=>$('#modal').classList.remove('show');
+function subDone(group,key,total,badge){
+  S.sub[key]=true; save(); const el=$('#s-'+key); if(el) el.textContent='✅';
+  if(total.every(k=>S.sub[k])) done(badge);
+}
+
+/* ---------- simpan isian ---------- */
+$$('.keep').forEach(el=>{
+  if(S.txt[el.id]!=null) el.value=S.txt[el.id];
+  el.addEventListener('input',()=>{S.txt[el.id]=el.value; save(); previews();});
+});
+
+/* ============ MISI 1 ============ */
+const PANELS=[
+ ['📦','Kotak bacaan (<i>leestrommel</i>) kiriman Ayah sudah datang! Isinya koran, majalah, dan buku-buku.'],
+ ['📰','Kartini sangat suka majalah <i>De Hollandsche Lelie</i>. Ia membacanya dengan senang hati.'],
+ ['🌍','Dari membaca, Kartini tahu bahwa di Eropa anak perempuan bisa bersekolah sampai dewasa. Kartini ingin seperti itu juga.'],
+ ['✍️','Kartini punya banyak ide. Ia menuliskannya dan mengirimnya ke majalah. Tulisannya bagus, jadi majalah memuatnya!'],
+ ['💌','Kartini punya sahabat pena. Dalam surat-suratnya, ia bercerita tentang cita-citanya mendirikan sekolah untuk perempuan.'],
+ ['🏫','Kartini berhasil mendirikan sekolah. Setelah ia wafat, surat-suratnya dibukukan dan dibaca banyak orang.']
+];
+let ci=0;
+function renderComic(){
+  const p=PANELS[ci];
+  $('#comic').innerHTML=`<div class="big">${p[0]}</div><p>${p[1]}</p><small style="opacity:.6">Gambar ${ci+1} dari ${PANELS.length}</small>`;
+  $('#dots').innerHTML=PANELS.map((_,i)=>`<i class="${i===ci?'on':''}"></i>`).join('');
+  $('#cPrev').disabled=ci===0; $('#cNext').disabled=ci===PANELS.length-1;
+}
+$('#cPrev').onclick=()=>{ci=Math.max(0,ci-1); renderComic(); stopSpeak();};
+$('#cNext').onclick=()=>{ci=Math.min(PANELS.length-1,ci+1); renderComic(); stopSpeak();};
+$('#cSpeak').onclick=()=>speak(PANELS[ci][1].replace(/<[^>]+>/g,''));
+renderComic();
+
+const STMT=[
+ ['Kartini lahir pada 21 April 1879.',true,''],
+ ['Ayah Kartini berlangganan kotak baca.',true,''],
+ ['Kotak baca berisi koran, majalah, dan buku-buku.',true,''],
+ ['Kartini suka menulis surat untuk sahabat-sahabatnya.',true,''],
+ ['Pada masa Kartini hidup, anak perempuan sulit bersekolah.',true,''],
+ ['Setelah dewasa, Kartini mendirikan sekolah untuk anak perempuan.',true,''],
+ ['Kartini lahir pada tahun 1900.',false,'Kartini lahir pada 21 April 1879.'],
+ ['Kartini jadi berangkat bersekolah ke Belanda.',false,'Kartini tidak jadi mengambil beasiswa ke Belanda.']
+];
+$('#stmts').innerHTML=STMT.map((s,i)=>`<label class="stmt" id="st${i}"><input type="checkbox" data-i="${i}"><span>${esc(s[0])}<small></small></span></label>`).join('');
+$('#stmtCheck').onclick=()=>{
+  let wrong=0;
+  STMT.forEach((s,i)=>{
+    const row=$('#st'+i), c=row.querySelector('input').checked, ok=(c===s[1]);
+    row.classList.toggle('ok',ok); row.classList.toggle('bad',!ok);
+    row.querySelector('small').textContent= ok?'':(s[1]?'Pernyataan ini benar, ayo dicentang.':'Hmm, ini salah. '+s[2]);
+    if(!ok) wrong++;
+  });
+  const m=$('#stmtMsg');
+  if(wrong===0){m.textContent='🎉 Hebat! Semua jawabanmu tepat!'; m.style.color='#1d8458'; done('m1');}
+  else {m.textContent='Ada '+wrong+' yang belum tepat. Baca lagi komiknya, lalu coba lagi ya! 💪'; m.style.color='#c2185b';}
+};
+const BEN=[['📚','Punya banyak pengetahuan'],['🔤','Punya banyak kosakata sehingga mudah menulis'],['🧐','Tidak mudah percaya berita, mencari kebenarannya dulu'],['❤️','Mudah memahami perasaan orang lain'],['🌏','Memahami peristiwa di sekitar'],['🛟','Tahu cara menghadapi suatu peristiwa'],['💡','Punya banyak gagasan'],['🚀','Mampu mewujudkan gagasan dengan baik']];
+$('#benefits').innerHTML=BEN.map(b=>`<div class="benefit"><span>${b[0]}</span>${b[1]}</div>`).join('');
+
+/* ============ MISI 2 ============ */
+/* A. urutan */
+const ORD=[
+ ['✍️','Penulis menemukan ide dan menuliskannya'],
+ ['📨','Naskah dikirim ke penerbit dan dibaca editor'],
+ ['🧑‍⚖️','Rapat redaksi memutuskan naskah diterbitkan atau tidak'],
+ ['📝','Editor membuat catatan, penulis merevisi naskah'],
+ ['🔎','Korektor bahasa memperbaiki salah ketik dan tata bahasa'],
+ ['🎨','Pengarah visual membuat konsep, ilustrator menggambar'],
+ ['📐','Desainer buku menata halaman'],
+ ['🖨️','Buku dicetak di percetakan'],
+ ['🏪','Bagian pemasaran mengedarkan buku ke toko buku']
+];
+let nxt=0;
+function renderOrder(){
+  $('#slots').innerHTML=ORD.slice(0,nxt).map(o=>`<li>${o[0]} ${o[1]}</li>`).join('');
+  const pool=$('#pool'); pool.innerHTML='';
+  shuffle(ORD.map((o,i)=>i)).filter(i=>i>=nxt).forEach(i=>{
+    const b=document.createElement('button'); b.className='opt'; b.textContent=ORD[i][0]+' '+ORD[i][1];
+    b.onclick=()=>{
+      if(i===nxt){nxt++; renderOrder();
+        if(nxt===ORD.length){$('#orderMsg').textContent='🎉 Urutan prosesnya sudah benar!'; subDone('m2','order',['order','match','majas'],'m2');}
+      } else {shake(b); $('#orderMsg').textContent='Belum tepat. Pikirkan: apa yang terjadi pada langkah ke-'+(nxt+1)+'?';}
+    };
+    pool.appendChild(b);
+  });
+  if(nxt<ORD.length) $('#orderMsg').textContent='Langkah ke-'+(nxt+1)+' apa ya?';
+}
+renderOrder();
+
+/* B. pasangkan */
+const MATCH=[
+ ['Penulis','orang yang menulis naskah'],
+ ['Editor','orang yang memeriksa dan mengedit naskah'],
+ ['Editor kepala','orang yang memutuskan naskah diterbitkan atau tidak'],
+ ['Korektor bahasa','orang yang memperbaiki kesalahan penulisan kata'],
+ ['Ilustrator','orang yang membuat gambar atau ilustrasi'],
+ ['Percetakan','tempat untuk mencetak buku']
+];
+let selT=null, matched=0;
+function renderMatch(){
+  const T=$('#mTerms'), D=$('#mDefs'); T.innerHTML=''; D.innerHTML='';
+  MATCH.forEach((m,i)=>{const b=document.createElement('button'); b.className='opt'; b.style.marginBottom='8px'; b.style.width='100%'; b.textContent=m[0]; b.dataset.i=i;
+    b.onclick=()=>{ $$('#mTerms .opt').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); selT=b; }; T.appendChild(b);});
+  shuffle(MATCH.map((m,i)=>i)).forEach(i=>{const b=document.createElement('button'); b.className='opt'; b.style.marginBottom='8px'; b.style.width='100%'; b.textContent=MATCH[i][1]; b.dataset.i=i;
+    b.onclick=()=>{
+      if(!selT){toast('Pilih pekerjaan di kiri dulu ya 👈'); return;}
+      if(selT.dataset.i===b.dataset.i){selT.classList.remove('sel'); selT.classList.add('ok'); b.classList.add('ok'); selT=null; matched++;
+        if(matched===MATCH.length){$('#matchMsg').textContent='🎉 Semua pasangan benar!'; subDone('m2','match',['order','match','majas'],'m2');}
+      } else {shake(b); shake(selT);}
+    }; D.appendChild(b);});
+}
+renderMatch();
+
+/* MCQ generik */
+function mcq(box,items,onAll){
+  let ok=0;
+  box.innerHTML='';
+  items.forEach(it=>{
+    const q=document.createElement('div'); q.className='q';
+    q.innerHTML=`<div class="qt">${it.q}</div><div class="row"></div><div class="why">✅ ${it.why}</div>`;
+    const row=q.querySelector('.row');
+    it.o.forEach((txt,i)=>{
+      const b=document.createElement('button'); b.className='opt'; b.textContent=txt;
+      b.onclick=()=>{
+        if(q.classList.contains('done')) return;
+        if(i===it.a){b.classList.add('ok'); q.classList.add('done'); ok++; if(ok===items.length) onAll();}
+        else {shake(b); toast('Coba lagi, kamu pasti bisa! 💪');}
+      };
+      row.appendChild(b);
+    });
+    box.appendChild(q);
+  });
+}
+mcq($('#majas'),[
+ {q:'1. Para pelaut <b>keras hati</b> berlayar mengikuti arah bintang. Mana yang metafora?',o:['pelaut','keras hati','berlayar'],a:1,why:'<b>Keras hati</b> berarti teguh pada niat, bukan hatinya benar-benar keras.'},
+ {q:'2. Putri kecil itu punya pipi ranum tomat. Mana yang metafora?',o:['putri kecil','pipi ranum tomat','itu'],a:1,why:'<b>Pipi ranum tomat</b> berarti pipi yang kemerahan seperti tomat matang.'},
+ {q:'3. Bagi Dina, buku adalah jendela dunia. Mana yang metafora?',o:['Dina','jendela dunia','buku'],a:1,why:'<b>Jendela dunia</b> berarti buku membuat kita tahu banyak hal di dunia.'},
+ {q:'4. Adik naik darah saat mainannya direbut. Mana yang metafora?',o:['naik darah','Adik','mainannya'],a:0,why:'<b>Naik darah</b> berarti sangat marah.'}
+],()=>subDone('m2','majas',['order','match','majas'],'m2'));
+
+/* Buku impianku */
+const COLORS=['#f0156a','#3f7cb8','#2fb67c','#6b3fa0','#ff9a3d'], EMOJIS=['🐋','🚀','🐉','🏝️','🧚','🦖'];
+let bc=S.txt.bcolor||COLORS[0], be=S.txt.bemoji||EMOJIS[0];
+function swatches(){
+  $('#bi-colors').innerHTML=COLORS.map(c=>`<button style="background:${c}" data-c="${c}" class="${c===bc?'sel':''}" aria-label="warna"></button>`).join('');
+  $('#bi-emojis').innerHTML=EMOJIS.map(e=>`<button data-e="${e}" class="${e===be?'sel':''}">${e}</button>`).join('');
+}
+$('#bi-colors').addEventListener('click',e=>{const b=e.target.closest('button'); if(b){bc=b.dataset.c; S.txt.bcolor=bc; save(); swatches(); previews();}});
+$('#bi-emojis').addEventListener('click',e=>{const b=e.target.closest('button'); if(b){be=b.dataset.e; S.txt.bemoji=be; save(); swatches(); previews();}});
+swatches();
+
+/* ============ MISI 3 ============ */
+const TEKS='Ikan penetap sementara hanya tinggal di hutan mangrove pada salah satu fase hidupnya, misalnya ikan sembilang dan ikan betutu. Ikan pengunjung hanya memasuki hutan mangrove saat air pasang untuk mencari makan. Ketika air surut, mereka kembali ke lautan.';
+const DICT={mangrove:'hutan bakau yang tumbuh di tepi pantai',penetap:'yang menetap atau tinggal',sementara:'tidak untuk selamanya, hanya beberapa waktu',fase:'tahap atau babak dalam hidup',pengunjung:'yang datang berkunjung, lalu pergi lagi',pasang:'air laut sedang naik',surut:'air laut sedang turun',memasuki:'masuk ke dalam',lautan:'laut yang luas'};
+const hard=new Set();
+$('#teks').innerHTML=TEKS.split(' ').map(w=>{const k=w.toLowerCase().replace(/[^a-z]/g,''); return `<span class="w" data-k="${k}">${esc(w)}</span>`;}).join(' ');
+$('#teks').addEventListener('click',e=>{
+  const s=e.target.closest('.w'); if(!s) return;
+  const k=s.dataset.k; s.classList.toggle('hard');
+  if(s.classList.contains('hard')){hard.add(k);} else {hard.delete(k);}
+  $('#kamus').innerHTML= DICT[k]?`📖 <b>${esc(k)}</b>: ${DICT[k]}`:`📖 <b>${esc(k)}</b>: Kata ini sudah kamu tandai. Cari artinya di kamus atau tanya temanmu ya!`;
+  $('#hardList').innerHTML= hard.size?[...hard].map(h=>`<span>${esc(h)}</span>`).join(''):'<em style="opacity:.6">belum ada</em>';
+});
+$('#tSpeak').onclick=()=>speak(TEKS);
+const m3flags=['quiz','steps'];
+mcq($('#m3q'),[
+ {q:'1. Kapan ikan pengunjung masuk ke hutan mangrove?',o:['Saat air pasang','Saat air surut','Setiap malam'],a:0,why:'Ikan pengunjung masuk saat air pasang untuk mencari makan.'},
+ {q:'2. Ikan sembilang termasuk ikan apa?',o:['Ikan pengunjung','Ikan penetap sementara','Ikan hias'],a:1,why:'Ikan sembilang tinggal di mangrove pada salah satu fase hidupnya.'}
+],()=>subDone('m3','quiz',m3flags,'m3'));
+$$('.stp').forEach(c=>c.addEventListener('change',()=>{
+  if($$('.stp').every(x=>x.checked)) subDone('m3','steps',m3flags,'m3');
+}));
+
+/* ============ PANGGUNG ============ */
+function previews(){
+  const g=id=>($('#'+id)||{}).value||'';
+  const nm=g('nama');
+  // buku impianku
+  $('#cover').style.background=bc; $('#cover .e').textContent=be;
+  $('#cv-judul').textContent=g('bi-judul')||'Judul Bukuku';
+  $('#cv-isi').textContent=g('bi-isi')||'Isi cerita akan tampil di sini.';
+  $('#cv-by').textContent=nm?('Ditulis oleh '+nm):'';
+  $('#cv-alasan').textContent=g('bi-alasan')||'…';
+  // kartu presentasi
+  $('#pv-judul').textContent=g('pk-judul')||'Judul Buku';
+  $('#pv-penulis').textContent='oleh '+(g('pk-penulis')||'…');
+  $('#pv-isi').textContent=g('pk-isi'); $('#pv-tokoh').textContent=g('pk-tokoh');
+  $('#pv-pendapat').textContent=g('pk-pendapat'); $('#pv-saran').textContent=g('pk-saran');
+  $('#pv-by').textContent=nm?('Dipresentasikan oleh '+nm):'';
+}
+$('#pSpeak').onclick=()=>{
+  const g=id=>$('#'+id).value;
+  speak(`Judul buku: ${g('pk-judul')}. Penulis: ${g('pk-penulis')}. Isi buku: ${g('pk-isi')}. Tokoh favorit: ${g('pk-tokoh')}. Pendapat saya: ${g('pk-pendapat')}. Saran untuk penulis: ${g('pk-saran')}.`);
+};
+$('#pPrint').onclick=()=>window.print();
+$$('.face').forEach(f=>{
+  const k=f.dataset.k, btns=$$('button',f);
+  if(S.face[k]!=null) btns[S.face[k]].classList.add('sel');
+  btns.forEach((b,i)=>b.onclick=()=>{btns.forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); S.face[k]=i; save();});
+});
+$('#pDone').onclick=()=>{
+  if(!$('#pk-judul').value.trim()||!$('#pk-isi').value.trim()||!$('#pk-tokoh').value.trim()){toast('Isi dulu judul, isi buku, dan tokoh favoritmu ya ✍️'); return;}
+  $('#s-rubric').textContent='✅'; done('p');
+};
+
+/* ============ REFLEKSI ============ */
+$$('.tg').forEach(t=>{
+  const k=t.dataset.k, [y,n]=$$('button',t);
+  const paint=()=>{y.classList.toggle('sel',S.refl[k]==='y'); n.classList.toggle('sel',S.refl[k]==='n');};
+  y.onclick=()=>{S.refl[k]='y'; save(); paint();}; n.onclick=()=>{S.refl[k]='n'; save(); paint();}; paint();
+});
+$('#rDone').onclick=()=>{
+  if(Object.keys(S.refl).length<5){toast('Pilih jawaban untuk kelima pernyataan dulu ya 😊'); return;}
+  done('r'); toast('Refleksimu tersimpan 💖');
+};
+
+/* ---------- mulai ---------- */
+['m2','m3'].forEach(()=>{});
+if(S.sub.order){}
+['order','match','majas','quiz','steps','rubric'].forEach(k=>{const el=$('#s-'+k); if(el&&S.sub[k]) el.textContent='✅';});
+renderBadges(); previews();
+const h=location.hash.replace('#',''); if(h) go(h);
+})();
+</script>
+</body>
+</html>
