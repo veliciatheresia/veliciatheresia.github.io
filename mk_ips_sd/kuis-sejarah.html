@@ -80,7 +80,7 @@ code{background:rgba(255,255,255,.15);padding:2px 6px;border-radius:6px}
 .slot.hover{background:#ffe9a8;border-color:var(--y)}
 .fillq{line-height:2.7}
 .rowslot{display:flex;flex-direction:column;gap:6px;margin:12px 0}
-.rowslot .lab{font-weight:700;font-size:1rem}
+.rowslot .lab{font-weight:700;font-size:1rem;display:flex;align-items:center;gap:12px}
 .rowslot .slot{display:block;min-height:50px;margin:0}
 .ghost{position:fixed;z-index:60;pointer-events:none;transform:translate(-50%,-50%) rotate(-3deg);box-shadow:0 10px 24px rgba(0,0,0,.4);max-width:80vw}
 .tok{display:inline-block;padding:2px 5px;border-radius:6px;cursor:pointer;line-height:1.6}
@@ -89,6 +89,10 @@ code{background:rgba(255,255,255,.15);padding:2px 6px;border-radius:6px}
 .fxs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .fx{border:2px solid #fff;background:transparent;color:#fff;border-radius:10px;padding:8px 12px;font-size:.95rem;font-weight:700;cursor:pointer}
 .fx.on{background:#fff;color:var(--bg2)}
+.pt{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#e5e7ea;flex:none}
+.ppl{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.ppl figure{width:104px;text-align:center;font-size:.8rem;line-height:1.25}
+.ppl .pt{width:76px;height:76px;border:3px solid #fff;display:block;margin:0 auto 6px}
 
 #adminBtn{position:fixed;right:10px;bottom:calc(8px + env(safe-area-inset-bottom,0px));background:transparent;color:rgba(255,255,255,.35);border:0;font-size:.8rem;cursor:pointer;z-index:10}
 #modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:70;padding:16px}
@@ -143,6 +147,16 @@ const SECS = [
   {name:'Tantangan Interaktif', icon:'🧩',      hint:''}
 ];
 
+/* Foto tokoh. Kosongkan img untuk memakai placeholder; ganti dengan path foto asli bila sudah ada,
+   contoh: img:'imgs/multatuli.jpg'. Jika file tidak ditemukan, placeholder dipakai otomatis. */
+const PLACEHOLDER = 'imgs/Portrait_Placeholder.png';
+const TOKOH = {
+  multatuli:  {name:'Eduard Douwes Dekker (Multatuli)', img:''},
+  deventer:   {name:'Conrad Theodore van Deventer',     img:'imgs/Van_Deventer.jpg'},
+  brooshooft: {name:'Pieter Brooshooft',                img:''}
+};
+const photo = k => `<img class="pt" src="${(TOKOH[k]&&TOKOH[k].img)||PLACEHOLDER}" alt="${TOKOH[k]?TOKOH[k].name:'Tokoh'}" onerror="this.onerror=null;this.src='${PLACEHOLDER}'">`;
+
 const KEYWORDS_ACC = ['kopi','teh','nila','kakao'];
 function parseTokens(s){ return s.split(' ').map(t=>{ const m=t.match(/^\{([AB])\}(.*)$/); return m?{w:m[2],g:m[1]}:{w:t,g:''}; }); }
 
@@ -154,6 +168,7 @@ const POOL = [
    fb:"Letak strategis dan kekayaan alam menjadi alasan utama penjajahan."},
   {kind:'mc',score:1,text:"Tiga isi Politik Etis atau Trias Van Deventer adalah …",
    opts:["irigasi, edukasi, emigrasi","irigasi, industri, emigrasi","edukasi, perdagangan, emigrasi","irigasi, edukasi, ekspor"],ans:0,
+   people:['deventer'],
    fb:"Trias Van Deventer: irigasi, edukasi, emigrasi."},
   {kind:'mc',score:1,text:"Edukasi dalam Politik Etis disebut awal mula pergerakan nasional karena …",
    opts:["sekolah rakyat membuat pribumi dapat membaca sehingga tumbuh kesadaran untuk melawan penjajahan","Belanda ingin segera meninggalkan Indonesia","sekolah hanya dibuka untuk orang Belanda","pelajar dilarang bertanya tentang nasib bangsa"],ans:0,
@@ -179,6 +194,7 @@ const POOL = [
    parts:["Buku Max Havelaar ditulis oleh Eduard Douwes Dekker dengan nama pena ",{s:0},", yang pernah tinggal di ",{s:1}," sebagai pegawai Belanda."],
    bank:['Multatuli','Banten','Brooshooft','Yogyakarta','Van Deventer','Maluku'].map(w=>({id:w,t:w})),
    key:[['Multatuli'],['Banten']],
+   people:['multatuli'],
    fb:"Multatuli menulis Max Havelaar tentang penderitaan rakyat Banten."},
   {kind:'fill',score:2,hint:SECS[2].hint,
    parts:["Sekolah rakyat dibentuk melalui kebijakan ",{s:0}," agar rakyat pribumi dapat ",{s:1},"."],
@@ -207,6 +223,7 @@ const POOL = [
     {id:'Q',t:"berkeliling Pulau Jawa tahun 1887 dan melapor kepada 12 politisi"},
     {id:'R',t:"menulis buku tentang penderitaan rakyat Banten akibat tanam paksa"}],
    key:['R','P','Q'],
+   pics:['multatuli','deventer','brooshooft'], people:['multatuli','deventer','brooshooft'],
    fb:"Multatuli menulis Max Havelaar; Van Deventer menyatakan hutang kehormatan; Brooshooft melapor kepada 12 politisi."},
   {kind:'find',score:3,hint:"Ketuk kata yang salah (ada 2 kesalahan), lalu pilih kata perbaikannya",
    tokens:parseTokens("Politik Etis muncul sebagai respons kritik terhadap tanam paksa. Isinya adalah irigasi, {A}industri, dan emigrasi. Emigrasi memindahkan sebagian penduduk dari {B}Sumatra {B}ke {B}Jawa {B}dan {B}Madura untuk mengurangi kepadatan penduduk. Edukasi membuka sekolah rakyat sehingga pribumi dapat membaca."),
@@ -282,7 +299,8 @@ function render(m){
       H(`<div class="c"><div class="big">${icon}</div><h2 class="${cls}">${txt}</h2>
         <p>Skor soal: <b>${m.sc} / ${m.max}</b></p><div class="pts">+${m.pts}</div>
         <p>Total: <b>${m.score}</b> poin · Peringkat ${m.rank}</p>
-        <div class="fbbox">💡 ${m.fb}</div></div>`); break; }
+        <div class="fbbox">💡 ${m.fb}</div>
+        ${(m.people||[]).length?`<div class="ppl">${m.people.map(k=>`<figure>${photo(k)}<figcaption>${TOKOH[k]?TOKOH[k].name:''}</figcaption></figure>`).join('')}</div>`:''}</div>`); break; }
     case 'hq':
       H(`<div class="c"><div class="tag">Bagian ${m.sec}: ${SECS[m.sec-1].name} · Soal ${m.n}/3 (${m.round+1}/12)</div>
         <div class="bar" style="margin-top:14px"><i id="barI"></i></div><div class="tm" id="tm">${m.total}</div>
@@ -363,7 +381,7 @@ function drawAssign(){
   const slot=i=>`<span class="slot ${Q.vals[i]?'full':''}" data-slot="${i}">${Q.vals[i]?chip(Q.vals[i],i):''}</span>`;
   let body;
   if(v.kind==='fill') body=`<div class="qt fillq">${v.parts.map(p=>typeof p==='string'?p:slot(p.s)).join('')}</div>`;
-  else body=`<div class="qt"><div style="font-weight:700">${v.text}</div>${v.rows.map((r,i)=>`<div class="rowslot"><span class="lab">${r}</span>${slot(i)}</div>`).join('')}</div>`;
+  else body=`<div class="qt"><div style="font-weight:700">${v.text}</div>${v.rows.map((r,i)=>`<div class="rowslot"><span class="lab">${v.pics&&v.pics[i]?photo(v.pics[i]):''}<span>${r}</span></span>${slot(i)}</div>`).join('')}</div>`;
   const used=new Set(Q.vals);
   const bank=v.bank.filter(b=>!used.has(b.id)).map(b=>chip(b.id,-1)).join('');
   root.innerHTML=body+`<div class="bank" id="bank">${bank||'<small style="opacity:.7">Semua kartu sudah dipakai</small>'}</div>
@@ -522,7 +540,7 @@ function makeView(q){
     case 'mc': v.text=q.text; v.opts=shuffle(q.opts.map((t,i)=>({i,t}))); v.hint=SECS[0].hint; break;
     case 'tf': v.text=q.text; v.hint=SECS[1].hint; break;
     case 'fill': v.parts=q.parts; v.bank=shuffle(q.bank); v.n=q.key.length; break;
-    case 'order': case 'match': v.text=q.text; v.rows=q.rows; v.bank=shuffle(q.bank); v.n=q.rows.length; break;
+    case 'order': case 'match': v.text=q.text; v.rows=q.rows; v.pics=q.pics||null; v.bank=shuffle(q.bank); v.n=q.rows.length; break;
     case 'find': v.tokens=q.tokens.map(t=>t.w); v.opts=shuffle(q.fixOpts); break;
   }
   return v;
@@ -632,7 +650,7 @@ function endRound(){
   G.players.forEach(p=>{
     const max=p.cur.score;
     const status=!p.answered?'skip':(p.sc>=max?'full':(p.sc>0?'part':'none'));
-    send(p,{t:'reveal',status,sc:p.sc,max,pts:p.pts,score:p.score,rank:rk.findIndex(x=>x.team===p.team)+1,fb:p.cur.fb});
+    send(p,{t:'reveal',status,sc:p.sc,max,pts:p.pts,score:p.score,rank:rk.findIndex(x=>x.team===p.team)+1,fb:p.cur.fb,people:p.cur.people||[]});
   });
   const all=[...G.players.values()];
   render({t:'hreveal',ok:all.filter(p=>p.answered&&p.sc>=p.cur.score).length,total:all.length});
