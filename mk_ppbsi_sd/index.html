@@ -7,215 +7,235 @@
 <meta name="description" content="Media ajar digital Bahasa Indonesia Kelas V: Buku Jendela Dunia">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --pink:#f0156a; --pink-soft:#fde0ec; --blue:#3f7cb8; --blue-soft:#dcecfa;
-  --cream:#fff6e0; --yellow:#ffd25e; --purple:#6b3fa0; --purple-soft:#ece1f7;
-  --green:#2fb67c; --green-soft:#d9f5e8; --orange:#ff9a3d; --ink:#2d2540; --white:#fff;
-  --r:22px; --shadow:0 6px 0 rgba(45,37,64,.12);
+  --pink:#ff7ab3; --pink-soft:#ffe1ee; --blue:#6cb4ff; --blue-soft:#dcedff;
+  --yellow:#ffd23f; --yellow-soft:#fff3bf; --purple:#b79cff; --purple-soft:#ece5ff;
+  --green:#4cd9a0; --green-soft:#d6f7e8; --orange:#ffa14a; --cream:#fff3bf;
+  --ink:#23275c; --sky:#c9ecff; --white:#fff;
+  --r:30px; --line:4px solid var(--ink); --shadow:0 6px 0 var(--ink);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{
-  font-family:'Nunito','Trebuchet MS',system-ui,sans-serif; color:var(--ink);
-  background:linear-gradient(180deg,#fff0f6 0%,var(--cream) 40%,#e9f4ff 100%) fixed;
-  font-size:18px; line-height:1.55; padding-bottom:96px; min-height:100vh;
-}
-h1,h2,h3,.fun{font-family:'Baloo 2','Comic Sans MS',system-ui,sans-serif; line-height:1.15}
-button{font-family:inherit; font-size:inherit; cursor:pointer; border:0; color:inherit}
-textarea,input[type=text]{font-family:inherit; font-size:1rem; width:100%; padding:12px 14px; border:3px solid #e4d7f2; border-radius:16px; background:#fff; color:var(--ink)}
-textarea{min-height:90px; resize:vertical}
-textarea:focus,input:focus,button:focus-visible{outline:4px solid var(--yellow); outline-offset:2px}
-label{font-weight:700; display:block; margin:12px 0 4px}
+body{font-family:'Fredoka','Trebuchet MS',system-ui,sans-serif;font-weight:500;color:var(--ink);background:var(--sky);font-size:19px;line-height:1.6;padding-bottom:116px;min-height:100vh}
+h1,h2,h3,.fun{font-weight:700;line-height:1.2}
+button{font:inherit;cursor:pointer;border:0;color:inherit;background:none}
+textarea,input[type=text]{font:inherit;width:100%;padding:12px 16px;border:4px solid var(--ink);border-radius:22px;background:#fff;color:var(--ink)}
+textarea{min-height:96px;resize:vertical}
+:focus-visible{outline:5px solid var(--purple);outline-offset:3px}
+label{font-weight:600;display:block;margin:14px 0 6px}
+.doodles{display:none}
 
-/* doodles */
-.doodles{position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden}
-.doodles span{position:absolute; font-size:2rem; opacity:.25; animation:float 7s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-18px) rotate(6deg)}}
+/* kepala */
+header{width:calc(100% - 28px);max-width:920px;margin:14px auto 0;padding:10px 12px 10px 20px;background:#fff;border:var(--line);border-radius:999px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;position:relative;z-index:2}
+header .logo{font-size:2rem}
+header h1{font-size:1.2rem;flex:1;min-width:0}
+header small{display:block;font-weight:500;font-size:.8rem}
+.chip{background:var(--yellow);border:3px solid var(--ink);border-radius:999px;padding:4px 14px;font-weight:700;white-space:nowrap}
+@media(max-width:480px){header h1{font-size:1rem}}
 
-/* header */
-header{position:sticky; top:0; z-index:20; background:var(--pink); color:#fff; padding:10px 16px; display:flex; align-items:center; gap:12px; box-shadow:0 4px 0 rgba(0,0,0,.12)}
-header .logo{font-size:1.9rem}
-header h1{font-size:1.25rem; flex:1}
-header small{display:block; font-family:'Nunito'; font-weight:600; font-size:.75rem; opacity:.9}
-.chip{background:#fff; color:var(--pink); border-radius:999px; padding:4px 12px; font-weight:800; font-size:.9rem; white-space:nowrap}
+main{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:20px 14px}
+.view{display:none}
+.view.active{display:block;animation:pop .3s ease}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-main{position:relative; z-index:1; max-width:920px; margin:0 auto; padding:18px 14px}
-.view{display:none; animation:pop .35s ease}
-.view.active{display:block}
-@keyframes pop{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
-
-.card{background:#fff; border-radius:var(--r); padding:20px; margin:16px 0; box-shadow:var(--shadow); border:3px solid #fff}
-.card.pink{background:var(--pink-soft)} .card.blue{background:var(--blue-soft)} .card.yellow{background:#fff0c2} .card.green{background:var(--green-soft)} .card.purple{background:var(--purple-soft)}
-.card h2{color:var(--pink); font-size:1.5rem; margin-bottom:6px}
-.card h3{color:var(--blue); font-size:1.2rem; margin-bottom:6px}
-.pill{display:inline-block; background:var(--blue); color:#fff; border-radius:999px; padding:4px 14px; font-family:'Baloo 2'; font-weight:700; font-size:.95rem; margin-bottom:8px}
+.card{background:#fff;border:var(--line);border-radius:var(--r);padding:22px;margin:24px 0;box-shadow:var(--shadow)}
+.card.pink{background:var(--pink-soft)} .card.blue{background:var(--blue-soft)} .card.yellow{background:var(--yellow-soft)} .card.green{background:var(--green-soft)} .card.purple{background:var(--purple-soft)}
+.card h2{font-size:1.6rem;margin-bottom:8px}
+.card h3{font-size:1.25rem;margin-bottom:6px}
+.pill{display:inline-block;background:var(--blue);border:3px solid var(--ink);border-radius:999px;padding:2px 14px;font-weight:700;font-size:.95rem;margin-bottom:10px;transform:rotate(-2deg)}
 .pill.pk{background:var(--pink)} .pill.gr{background:var(--green)} .pill.pu{background:var(--purple)}
 
-.btn{display:inline-flex; align-items:center; gap:8px; background:var(--pink); color:#fff; font-weight:800; padding:12px 22px; border-radius:999px; box-shadow:0 5px 0 #b30e4f; transition:transform .1s; margin:6px 6px 6px 0}
-.btn:active{transform:translateY(4px); box-shadow:0 1px 0 #b30e4f}
-.btn.blue{background:var(--blue); box-shadow:0 5px 0 #2a5a8a}
-.btn.green{background:var(--green); box-shadow:0 5px 0 #1d8458}
-.btn.yellow{background:var(--yellow); color:var(--ink); box-shadow:0 5px 0 #c9a02b}
-.btn.ghost{background:#fff; color:var(--pink); box-shadow:0 5px 0 #f3b3cd; border:3px solid var(--pink)}
-.btn[disabled]{opacity:.45; pointer-events:none}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--pink);color:var(--ink);font-weight:700;padding:12px 24px;border:4px solid var(--ink);border-radius:999px;box-shadow:0 5px 0 var(--ink);transition:transform .1s,box-shadow .1s;margin:6px 8px 8px 0}
+.btn:active{transform:translateY(5px);box-shadow:0 0 0 var(--ink)}
+.btn.blue{background:var(--blue)} .btn.green{background:var(--green)} .btn.yellow{background:var(--yellow)} .btn.ghost{background:#fff}
+.btn[disabled]{opacity:.4;pointer-events:none}
 
-/* hero */
-.hero{display:flex; gap:16px; align-items:center; flex-wrap:wrap; background:linear-gradient(135deg,#ff5c9d,#f0156a); color:#fff; border-radius:30px; padding:24px; box-shadow:var(--shadow)}
-.hero .mascot{font-size:5rem; animation:float 4s ease-in-out infinite}
-.hero h2{font-size:2rem; color:#fff}
+/* sambutan */
+.hero{display:flex;gap:20px;align-items:center;flex-wrap:wrap;background:var(--pink);border:var(--line);border-radius:44px;padding:26px;box-shadow:var(--shadow)}
+.hero .mascot{font-size:4.5rem;background:#fff;border:var(--line);border-radius:50%;width:116px;height:116px;display:flex;align-items:center;justify-content:center;animation:bounce 3s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.hero h2{font-size:2.2rem}
 .hero p{font-weight:600}
-.hero input{margin-top:10px; border-color:#fff}
-.question{background:#fff; color:var(--pink); border-radius:16px; padding:10px 16px; font-weight:800; margin-top:12px; display:inline-block}
+.hero input{margin-top:12px}
+.question{background:#fff;border:3px solid var(--ink);border-radius:22px;padding:8px 18px;font-weight:700;margin-top:12px;display:inline-block}
 
-.map{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-.island{border-radius:26px; padding:18px; text-align:left; background:#fff; box-shadow:var(--shadow); position:relative; border:4px solid transparent; transition:transform .15s}
-.island:hover{transform:translateY(-4px) rotate(-1deg)}
-.island .em{font-size:3rem; display:block}
-.island b{font-family:'Baloo 2'; font-size:1.25rem; display:block}
-.island span.d{font-size:.95rem; opacity:.85; display:block}
-.island.i1{background:var(--pink-soft); border-color:var(--pink)}
-.island.i2{background:var(--blue-soft); border-color:var(--blue)}
-.island.i3{background:var(--green-soft); border-color:var(--green)}
-.island.i4{background:#fff0c2; border-color:var(--orange)}
-.island.i5{background:var(--purple-soft); border-color:var(--purple)}
-.island .tick{position:absolute; top:10px; right:12px; font-size:1.8rem; display:none}
-.island.done .tick{display:block}
+/* peta */
+.map{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin-top:10px}
+.island{border:var(--line);border-radius:40px;padding:20px;text-align:left;color:var(--ink);box-shadow:var(--shadow);position:relative;transition:transform .15s}
+.island:nth-child(odd){transform:rotate(-1deg)} .island:nth-child(even){transform:rotate(1deg)}
+.island:hover{transform:scale(1.03) rotate(0)}
+.island .em{font-size:2.4rem;display:flex;align-items:center;justify-content:center;width:76px;height:76px;background:#fff;border:3px solid var(--ink);border-radius:50%;margin-bottom:10px}
+.island b{font-size:1.3rem;display:block;line-height:1.2;margin-bottom:4px}
+.island span.d{font-size:.95rem;display:block;font-weight:500}
+.island.i1{background:var(--pink)} .island.i2{background:var(--blue)} .island.i3{background:var(--green)} .island.i4{background:var(--yellow)} .island.i5{background:var(--purple)}
+.island .tick{position:absolute;top:-12px;right:-6px;width:46px;height:46px;background:#fff;border:3px solid var(--ink);border-radius:50%;font-size:1.5rem;display:none;align-items:center;justify-content:center}
+.island.done .tick{display:flex}
 
-.progress{height:22px; background:#fff; border-radius:999px; overflow:hidden; border:3px solid #fff; box-shadow:inset 0 2px 4px rgba(0,0,0,.15)}
-.progress i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--yellow),var(--orange)); border-radius:999px; transition:width .6s}
-.badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
-.badge{width:78px; text-align:center; font-size:.72rem; font-weight:800; line-height:1.15; filter:grayscale(1); opacity:.45; transition:.4s}
-.badge .b{font-size:2.3rem; display:block; background:#fff; border-radius:50%; width:62px; height:62px; line-height:62px; margin:0 auto 4px; box-shadow:var(--shadow)}
-.badge.got{filter:none; opacity:1; animation:pop .5s}
+.progress{height:30px;background:#fff;border:var(--line);border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--green);transition:width .6s}
+.badges{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+.badge{width:82px;text-align:center;font-size:.78rem;font-weight:600;line-height:1.15;filter:grayscale(1);opacity:.5;transition:.4s}
+.badge .b{font-size:2rem;display:flex;align-items:center;justify-content:center;background:#fff;border:3px solid var(--ink);border-radius:50%;width:64px;height:64px;margin:0 auto 4px}
+.badge.got{filter:none;opacity:1;animation:pop .5s}
 
-/* mascot tip */
-.tip{display:flex; gap:12px; align-items:flex-start; background:#fff8dc; border:3px dashed var(--yellow); border-radius:20px; padding:12px 16px; margin:12px 0}
+.tip{display:flex;gap:14px;align-items:center;background:var(--yellow-soft);border:3px dashed var(--ink);border-radius:26px;padding:12px 18px;margin:12px 0}
 .tip .m{font-size:2.4rem}
 
-/* comic */
-.comic{background:var(--cream); border-radius:24px; padding:20px; text-align:center; border:4px solid var(--yellow); min-height:250px; display:flex; flex-direction:column; justify-content:center; gap:10px}
+/* komik */
+.comic{background:#fff;border:var(--line);border-radius:34px;padding:24px;text-align:center;min-height:270px;display:flex;flex-direction:column;justify-content:center;gap:10px}
 .comic .big{font-size:5rem}
-.comic p{font-size:1.15rem; font-weight:600}
-.dots{display:flex; gap:6px; justify-content:center; margin:8px 0}
-.dots i{width:12px; height:12px; border-radius:50%; background:#e2d6ef}
+.comic p{font-size:1.25rem;font-weight:500}
+.dots{display:flex;gap:8px;justify-content:center;margin:12px 0}
+.dots i{width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--ink)}
 .dots i.on{background:var(--pink)}
 
-/* quiz */
-.stmt{display:flex; gap:12px; align-items:flex-start; background:#fff; border:3px solid #eee; border-radius:16px; padding:10px 14px; margin:8px 0; font-weight:600}
-.stmt input{width:26px; height:26px; margin-top:3px; accent-color:var(--pink); flex:none}
-.stmt.ok{background:var(--green-soft); border-color:var(--green)}
-.stmt.bad{background:#ffe3e3; border-color:#e5484d}
-.stmt small{display:block; font-weight:600; opacity:.8}
-.msg{margin-top:10px; font-weight:800; min-height:1.5em}
+/* kuis */
+.stmt{display:flex;gap:14px;align-items:flex-start;background:#fff;border:3px solid var(--ink);border-radius:22px;padding:12px 16px;margin:10px 0;font-weight:600;cursor:pointer}
+.stmt input{width:28px;height:28px;margin-top:2px;accent-color:var(--ink);flex:none}
+.stmt.ok{background:var(--green-soft)}
+.stmt.bad{background:#ffdede}
+.stmt small{display:block;font-weight:500}
+.msg{margin-top:12px;font-weight:700;min-height:1.5em}
 
-.benefits{display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
-.benefit{background:#fff; border-radius:18px; padding:12px 14px; font-weight:700; font-size:.95rem; display:flex; gap:10px; align-items:center; border:3px solid var(--pink-soft)}
+.benefits{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.benefit{background:#fff;border:3px solid var(--ink);border-radius:24px;padding:12px 16px;font-weight:600;font-size:.95rem;display:flex;gap:12px;align-items:center}
 .benefit span{font-size:1.8rem}
 
-/* order + match */
-.pool,.slots{display:flex; flex-wrap:wrap; gap:10px; margin:10px 0}
-.opt{background:#fff; border:3px solid var(--blue); color:var(--ink); border-radius:16px; padding:10px 14px; font-weight:700; text-align:left; box-shadow:0 4px 0 #b9d3ec; flex:1 1 240px}
-.opt:active{transform:translateY(3px)}
-.opt.ok{background:var(--green-soft); border-color:var(--green); box-shadow:0 4px 0 #9cdcc0; pointer-events:none}
-.opt.sel{background:#fff0c2; border-color:var(--orange)}
+/* urutkan dan pasangkan */
+.pool,.slots{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+.opt{background:#fff;border:3px solid var(--ink);color:var(--ink);border-radius:22px;padding:12px 16px;font-weight:600;text-align:left;box-shadow:0 4px 0 var(--ink);flex:1 1 240px;transition:transform .1s,box-shadow .1s}
+.opt:active{transform:translateY(4px);box-shadow:0 0 0 var(--ink)}
+.opt.ok{background:var(--green);pointer-events:none}
+.opt.sel{background:var(--yellow)}
 .shake{animation:shake .4s}
 @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-ol.timeline{list-style:none; counter-reset:s; margin:10px 0}
-ol.timeline li{counter-increment:s; background:var(--green-soft); border:3px solid var(--green); border-radius:16px; padding:10px 14px 10px 54px; margin:8px 0; position:relative; font-weight:700; animation:pop .3s}
-ol.timeline li::before{content:counter(s); position:absolute; left:10px; top:50%; transform:translateY(-50%); width:32px; height:32px; line-height:32px; text-align:center; border-radius:50%; background:var(--green); color:#fff; font-family:'Baloo 2'}
-.cols{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+ol.timeline{list-style:none;counter-reset:s;margin:12px 0}
+ol.timeline li{counter-increment:s;background:var(--green-soft);border:3px solid var(--ink);border-radius:22px;padding:12px 16px 12px 62px;margin:10px 0;position:relative;font-weight:600;animation:pop .3s}
+ol.timeline li::before{content:counter(s);position:absolute;left:12px;top:50%;transform:translateY(-50%);width:36px;height:36px;line-height:30px;text-align:center;border-radius:50%;background:#fff;border:3px solid var(--ink);font-weight:700}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .cols .opt{flex:none}
-@media(max-width:560px){ .cols{grid-template-columns:1fr} }
-.sub{float:right; font-size:1.6rem}
+@media(max-width:560px){.cols{grid-template-columns:1fr}}
+.sub{float:right;font-size:1.8rem}
 
-.q{background:#fff; border-radius:18px; padding:14px; margin:10px 0; border:3px solid var(--blue-soft)}
-.q .qt{font-weight:800; margin-bottom:8px}
-.q .why{display:none; margin-top:8px; font-weight:600; color:#1d8458}
+.q{background:#fff;border:3px solid var(--ink);border-radius:26px;padding:16px;margin:14px 0}
+.q .qt{font-weight:700;margin-bottom:10px}
+.q .why{display:none;margin-top:10px;font-weight:600;color:#0b6b42}
 .q.done .why{display:block}
-.q .row{display:flex; flex-wrap:wrap; gap:8px}
-.q .row .opt{flex:1 1 140px; text-align:center}
+.q .row{display:flex;flex-wrap:wrap;gap:10px}
+.q .row .opt{flex:1 1 140px;text-align:center}
 
-/* reading */
-.text{background:#fff; border-radius:18px; padding:16px; font-size:1.15rem; line-height:2; border:3px solid var(--green-soft)}
-.w{cursor:pointer; border-radius:8px; padding:1px 2px; transition:.15s}
-.w:hover{background:#fff0c2}
-.w.hard{background:var(--yellow); box-shadow:0 2px 0 #c9a02b}
-.kamus{margin-top:10px; background:var(--purple-soft); border-radius:16px; padding:10px 14px; font-weight:700; min-height:48px}
-.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
-.chips span{background:var(--yellow); border-radius:999px; padding:2px 12px; font-weight:800; font-size:.9rem}
-.steps label{display:flex; gap:12px; align-items:center; background:#fff; border:3px solid var(--green-soft); border-radius:16px; padding:10px 14px; margin:8px 0; font-weight:700; cursor:pointer}
-.steps input{width:26px; height:26px; accent-color:var(--green); flex:none}
-.steps b{background:var(--green); color:#fff; border-radius:50%; width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; flex:none; font-family:'Baloo 2'}
-.shelf{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
-.shelf a{display:block; text-decoration:none; color:var(--ink); background:#fff; border-radius:18px; padding:14px; border:3px solid var(--blue-soft); font-weight:700; box-shadow:var(--shadow)}
-.shelf a span{font-size:2.4rem; display:block}
-.shelf a small{display:block; font-weight:600; opacity:.75}
+/* membaca */
+.text{background:#fff;border:3px solid var(--ink);border-radius:26px;padding:18px;font-size:1.25rem;line-height:2.1}
+.w{cursor:pointer;border-radius:8px;padding:1px 2px;transition:.15s}
+.w:hover{background:var(--yellow-soft)}
+.w.hard{background:var(--yellow);text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:4px}
+.kamus{margin-top:12px;background:var(--purple-soft);border:3px solid var(--ink);border-radius:22px;padding:12px 16px;font-weight:600;min-height:54px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chips span{background:var(--yellow);border:2px solid var(--ink);border-radius:999px;padding:2px 14px;font-weight:700;font-size:.9rem}
+.steps label{display:flex;gap:14px;align-items:center;background:#fff;border:3px solid var(--ink);border-radius:22px;padding:12px 16px;margin:10px 0;font-weight:600;cursor:pointer}
+.steps input{width:28px;height:28px;accent-color:var(--ink);flex:none}
+.steps b{background:var(--green);border:3px solid var(--ink);border-radius:50%;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.shelf{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.shelf a{display:block;text-decoration:none;color:var(--ink);background:#fff;border:3px solid var(--ink);border-radius:26px;padding:16px;font-weight:700;box-shadow:0 4px 0 var(--ink);transition:transform .1s,box-shadow .1s}
+.shelf a:active{transform:translateY(4px);box-shadow:0 0 0 var(--ink)}
+.shelf a span{font-size:2.4rem;display:block}
+.shelf a small{display:block;font-weight:500}
 
-/* book cover + presentation card */
-.cover{border-radius:18px; padding:20px; color:#fff; text-align:center; min-height:230px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:8px; box-shadow:var(--shadow); border:5px solid rgba(255,255,255,.6)}
+/* sampul dan kartu */
+.cover{border:var(--line);border-radius:30px;padding:22px;color:#fff;text-align:center;min-height:240px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;box-shadow:var(--shadow);text-shadow:0 2px 0 rgba(35,39,92,.55)}
 .cover .e{font-size:3.6rem}
-.cover h3{color:#fff; font-size:1.7rem}
-.cover p{font-weight:600; font-size:.95rem}
-.swatch{display:flex; gap:8px; flex-wrap:wrap; margin:6px 0}
-.swatch button{width:44px; height:44px; border-radius:50%; border:4px solid #fff; box-shadow:0 2px 0 rgba(0,0,0,.25); font-size:1.3rem; background:#fff}
-.swatch button.sel{outline:4px solid var(--ink)}
-.two{display:grid; grid-template-columns:1fr 1fr; gap:18px}
-@media(max-width:700px){ .two{grid-template-columns:1fr} }
-.pcard{background:#fff; border:5px solid var(--purple); border-radius:20px; padding:16px; box-shadow:var(--shadow)}
-.pcard h3{color:var(--purple); font-size:1.5rem}
-.pcard dt{font-weight:800; color:var(--pink); margin-top:8px; font-size:.9rem}
-.pcard dd{font-weight:600; min-height:1.2em; white-space:pre-wrap}
-.rubric .r{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; background:#fff; border-radius:14px; padding:8px 12px; margin:6px 0; font-weight:700}
-.face button{background:#f5f0fa; border-radius:12px; font-size:1.6rem; padding:2px 10px; margin-left:4px; filter:grayscale(1); opacity:.6}
-.face button.sel{filter:none; opacity:1; background:var(--yellow)}
+.cover h3{color:#fff;font-size:1.7rem}
+.cover p{font-weight:600;font-size:.95rem}
+.swatch{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0}
+.swatch button{width:46px;height:46px;border-radius:50%;border:4px solid #fff;box-shadow:0 0 0 3px var(--ink);font-size:1.3rem;background:#fff}
+.swatch button.sel{outline:4px solid var(--ink);outline-offset:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:700px){.two{grid-template-columns:1fr}}
+.pcard{background:#fff;border:var(--line);border-radius:30px;padding:20px;box-shadow:var(--shadow)}
+.pcard h3{font-size:1.6rem}
+.pcard dt{font-weight:700;color:#5b34c9;margin-top:10px;font-size:.9rem}
+.pcard dd{font-weight:500;min-height:1.2em;white-space:pre-wrap}
+.rubric .r,.refl .r{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#fff;border:3px solid var(--ink);border-radius:22px;padding:10px 16px;margin:10px 0;font-weight:600}
+.face button{background:#fff;border:3px solid var(--ink);border-radius:16px;font-size:1.6rem;padding:2px 10px;margin-left:4px;filter:grayscale(1);opacity:.6}
+.face button.sel{filter:none;opacity:1;background:var(--yellow)}
+.refl .tg button{background:#fff;border:3px solid var(--ink);border-radius:999px;padding:6px 16px;font-weight:700;margin-left:4px;font-size:.9rem}
+.refl .tg button.sel.yes{background:var(--green)}
+.refl .tg button.sel.no{background:var(--orange)}
 
-/* reflection */
-.refl .r{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; background:#fff; border-radius:14px; padding:10px 14px; margin:6px 0; font-weight:700}
-.refl .tg button{background:#f5f0fa; border-radius:999px; padding:6px 14px; font-weight:800; margin-left:4px; font-size:.9rem}
-.refl .tg button.sel.yes{background:var(--green); color:#fff}
-.refl .tg button.sel.no{background:var(--orange); color:#fff}
+/* panduan guru */
+details{background:#fff;border:3px solid var(--ink);border-radius:24px;padding:12px 18px;margin:12px 0}
+summary{font-weight:700;cursor:pointer}
+details ul,details ol{margin:10px 0 0 22px;font-size:.95rem}
+table{border-collapse:collapse;width:100%;font-size:.9rem;margin-top:10px}
+td,th{border:2px solid var(--ink);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--yellow-soft)}
 
-details{background:#fff; border-radius:16px; padding:12px 16px; margin:10px 0; border:3px solid var(--blue-soft)}
-summary{font-weight:800; cursor:pointer; color:var(--blue)}
-details ul,details ol{margin:8px 0 0 22px; font-size:.95rem}
-table{border-collapse:collapse; width:100%; font-size:.9rem; margin-top:8px}
-td,th{border:2px solid var(--blue-soft); padding:6px 8px; text-align:left; vertical-align:top}
-th{background:var(--blue-soft)}
+/* menu bawah */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:var(--line);border-radius:30px 30px 0 0;display:flex;justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom))}
+.tab{display:flex;flex-direction:column;align-items:center;font-weight:700;font-size:.75rem;padding:2px 8px;border-radius:22px;border:3px solid transparent;min-width:62px;color:var(--ink)}
+.tab span{font-size:1.7rem;line-height:1.3}
+.tab.on{background:var(--yellow);border-color:var(--ink)}
 
-/* nav */
-nav.tabs{position:fixed; left:0; right:0; bottom:0; z-index:30; background:#fff; display:flex; justify-content:space-around; padding:6px 4px calc(6px + env(safe-area-inset-bottom)); box-shadow:0 -4px 0 rgba(0,0,0,.08); border-radius:22px 22px 0 0}
-.tab{background:none; display:flex; flex-direction:column; align-items:center; font-weight:800; font-size:.68rem; padding:4px 8px; border-radius:14px; color:#7a6e90; min-width:56px}
-.tab span{font-size:1.6rem}
-.tab.on{background:var(--pink-soft); color:var(--pink)}
-
-#toast{position:fixed; left:50%; bottom:110px; transform:translateX(-50%) translateY(30px); background:var(--ink); color:#fff; padding:12px 20px; border-radius:999px; font-weight:800; z-index:60; opacity:0; transition:.3s; max-width:90vw; text-align:center}
-#toast.show{opacity:1; transform:translateX(-50%)}
-.modal{position:fixed; inset:0; background:rgba(45,37,64,.7); z-index:70; display:none; align-items:center; justify-content:center; padding:20px}
+#toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%) translateY(30px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-weight:600;z-index:60;opacity:0;transition:.3s;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+.modal{position:fixed;inset:0;background:rgba(35,39,92,.75);z-index:70;display:none;align-items:center;justify-content:center;padding:20px}
 .modal.show{display:flex}
-.modal .box{background:#fff; border-radius:30px; padding:28px; max-width:460px; text-align:center; animation:pop .5s; border:6px solid var(--yellow)}
-.modal h2{color:var(--pink); font-size:2rem}
-.confetti{position:fixed; top:-40px; z-index:80; font-size:1.8rem; animation:fall linear forwards; pointer-events:none}
+.modal .box{background:#fff;border:var(--line);border-radius:40px;padding:28px;max-width:460px;text-align:center;animation:pop .5s;box-shadow:var(--shadow)}
+.modal h2{font-size:2rem}
+.confetti{position:fixed;top:-40px;z-index:80;font-size:1.8rem;animation:fall linear forwards;pointer-events:none}
 @keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
-footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity:.75; padding:10px 20px 0}
+footer{position:relative;z-index:1;text-align:center;font-size:.8rem;padding:10px 20px 0}
 
-@media(prefers-reduced-motion:reduce){ *{animation:none!important; transition:none!important} }
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media print{
-  header,nav.tabs,.no-print,.doodles,footer,#toast{display:none!important}
-  body{background:#fff; padding:0}
+  header,nav.tabs,.no-print,footer,#toast{display:none!important}
+  body{background:#fff;padding:0}
   .view{display:none!important} #panggung{display:block!important}
-  .card{box-shadow:none; border:0}
+  .card{box-shadow:none;border:0}
 }
+.banner{position:relative;border:var(--line);border-radius:40px;overflow:hidden;box-shadow:var(--shadow);line-height:0;margin-bottom:26px}
+.scene{display:block;width:100%;height:auto}
+.btitle{position:absolute;top:4%;left:50%;transform:translateX(-50%) rotate(-1deg);background:var(--yellow-soft);border:var(--line);border-radius:30px;padding:8px 26px 12px;text-align:center;line-height:1.2;box-shadow:0 5px 0 var(--ink);width:max-content;max-width:92%}
+.btitle h2{font-size:clamp(1.3rem,5.2vw,2.5rem)}
+.btitle span{display:inline-block;margin-top:4px;background:#d62839;color:#fff;border:3px solid var(--ink);border-radius:999px;padding:0 16px;font-weight:700;font-size:clamp(.8rem,2.6vw,1.1rem)}
+.strip{border:var(--line);border-radius:34px;overflow:hidden;box-shadow:var(--shadow);line-height:0;margin:8px 0 12px}
+.strip svg{display:block;width:100%;height:auto}
+
+/* animasi imut */
+.scene>use[href="#boy"]{animation:hop 2.6s ease-in-out infinite}
+.scene g use[href="#boy"]{animation:hop 2.6s ease-in-out -1.3s infinite}
+.scene use[href="#hij"]{animation:sway2 3.2s ease-in-out infinite}
+.scene use[href="#pig"]{animation:dribble 1.5s ease-in-out infinite}
+@keyframes hop{0%,50%,100%{transform:translateY(0)}14%{transform:translateY(-30px)}28%{transform:translateY(0)}38%{transform:translateY(-10px)}}
+@keyframes sway2{0%,100%{transform:translate(-6px,0)}25%{transform:translate(0,-8px)}50%{transform:translate(6px,0)}75%{transform:translate(0,-8px)}}
+@keyframes dribble{0%,50%,100%{transform:translateY(0)}25%,75%{transform:translateY(-16px)}}
+.eye{transform-box:fill-box;transform-origin:center;animation:blink 4s infinite}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+.cloud{animation:drift 12s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translateX(50px)}}
+.sun{transform-box:fill-box;transform-origin:center;animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.12)}}
+.flag{transform-box:fill-box;transform-origin:left center;animation:wave 1.6s ease-in-out infinite alternate}
+@keyframes wave{from{transform:skewY(-6deg) scaleX(.94)}to{transform:skewY(6deg) scaleX(1.04)}}
+.leaf{transform-box:fill-box;transform-origin:50% 100%;animation:treesway 4s ease-in-out infinite alternate}
+@keyframes treesway{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+.tw{transform-box:fill-box;transform-origin:center;animation:twinkle 2s ease-in-out infinite}
+.tw2{animation-delay:-.7s}.tw3{animation-delay:-1.3s}
+@keyframes twinkle{0%,100%{transform:scale(.6);opacity:.5}50%{transform:scale(1.2);opacity:1}}
+.bf{animation:flutter 7s ease-in-out infinite alternate}
+@keyframes flutter{0%{transform:translate(0,0)}33%{transform:translate(40px,-25px)}66%{transform:translate(20px,15px)}100%{transform:translate(70px,-10px)}}
+.btitle{animation:wobble 4s ease-in-out infinite}
+@keyframes wobble{0%,100%{transform:translateX(-50%) rotate(-1.5deg)}50%{transform:translateX(-50%) rotate(1.5deg)}}
+.strip use{animation:peek 2.6s ease-in-out infinite}
+.strip g use{animation-delay:-1.3s}
+.strip text{animation:peek 3s ease-in-out infinite alternate}
+@keyframes peek{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 </style>
 </head>
 <body>
-
-<div class="doodles" aria-hidden="true">
-  <span style="left:6%;top:14%">⭐</span><span style="left:88%;top:20%;animation-delay:1s">📚</span>
-  <span style="left:12%;top:62%;animation-delay:2s">☁️</span><span style="left:80%;top:68%;animation-delay:.5s">✏️</span>
-  <span style="left:46%;top:88%;animation-delay:1.5s">🌈</span><span style="left:92%;top:44%;animation-delay:2.5s">🎈</span>
-</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="boy" viewBox="0 0 100 160"><g stroke="#23275c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="32" y="108" width="14" height="38" rx="7" fill="var(--skin)"/><rect x="54" y="108" width="14" height="38" rx="7" fill="var(--skin)"/><ellipse cx="38" cy="150" rx="13" ry="7" fill="#fff"/><ellipse cx="62" cy="150" rx="13" ry="7" fill="#fff"/><path d="M28 96h44l4 24H54l-4-10-4 10H24z" fill="var(--bot)"/><path d="M30 76L14 56" fill="none" stroke-width="15"/><path d="M30 76L14 56" fill="none" stroke="var(--skin)" stroke-width="9"/><path d="M70 76L78 102" fill="none" stroke-width="15"/><path d="M70 76L78 102" fill="none" stroke="var(--skin)" stroke-width="9"/><rect x="28" y="64" width="44" height="40" rx="14" fill="#fff"/><path d="M50 68l-6 8 6 24 6-24z" fill="#e63946"/><circle cx="14" cy="54" r="7" fill="var(--skin)"/><circle cx="78" cy="104" r="6" fill="var(--skin)"/><circle cx="24" cy="42" r="5" fill="var(--skin)"/><circle cx="76" cy="42" r="5" fill="var(--skin)"/><circle cx="50" cy="38" r="26" fill="var(--skin)"/><path d="M24 38C20 8 80 6 76 38C68 26 58 24 50 24C42 24 32 26 24 38z" fill="var(--hair)"/><circle cx="40" cy="42" r="3.5" class="eye" fill="#23275c" stroke="none"/><circle cx="60" cy="42" r="3.5" class="eye" fill="#23275c" stroke="none"/><circle cx="33" cy="50" r="4" fill="#ff9fb0" stroke="none"/><circle cx="67" cy="50" r="4" fill="#ff9fb0" stroke="none"/><path d="M41 51q9 9 18 0z" fill="#fff" stroke-width="2.5"/></g></symbol><symbol id="hij" viewBox="0 0 100 160"><g stroke="#23275c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="36" cy="152" rx="13" ry="6" fill="#fff"/><ellipse cx="64" cy="152" rx="13" ry="6" fill="#fff"/><path d="M30 96h40l8 52H22z" fill="var(--bot)"/><path d="M70 80L84 62" fill="none" stroke-width="15"/><path d="M70 80L84 62" fill="none" stroke="var(--skin)" stroke-width="9"/><path d="M30 82L38 100" fill="none" stroke-width="15"/><path d="M30 82L38 100" fill="none" stroke="var(--skin)" stroke-width="9"/><rect x="28" y="74" width="44" height="34" rx="12" fill="#fff"/><circle cx="84" cy="60" r="7" fill="var(--skin)"/><path d="M50 8C20 8 12 36 16 60C18 78 30 88 50 88C70 88 82 78 84 60C88 36 80 8 50 8z" fill="var(--hair)"/><ellipse cx="50" cy="44" rx="20" ry="22" fill="var(--skin)"/><circle cx="40" cy="46" r="3.5" class="eye" fill="#23275c" stroke="none"/><circle cx="60" cy="46" r="3.5" class="eye" fill="#23275c" stroke="none"/><circle cx="33" cy="54" r="4" fill="#ff9fb0" stroke="none"/><circle cx="67" cy="54" r="4" fill="#ff9fb0" stroke="none"/><path d="M41 55q9 9 18 0z" fill="#fff" stroke-width="2.5"/><rect x="22" y="96" width="34" height="24" rx="4" fill="var(--book)"/><path d="M28 96v24" fill="none"/></g></symbol><symbol id="pig" viewBox="0 0 100 160"><g stroke="#23275c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="32" y="108" width="14" height="38" rx="7" fill="var(--skin)"/><rect x="54" y="108" width="14" height="38" rx="7" fill="var(--skin)"/><ellipse cx="38" cy="150" rx="13" ry="7" fill="#fff"/><ellipse cx="62" cy="150" rx="13" ry="7" fill="#fff"/><path d="M32 64h36l10 46H22z" fill="var(--bot)"/><path d="M32 74L40 98" fill="none" stroke-width="15"/><path d="M32 74L40 98" fill="none" stroke="var(--skin)" stroke-width="9"/><path d="M68 74L60 98" fill="none" stroke-width="15"/><path d="M68 74L60 98" fill="none" stroke="var(--skin)" stroke-width="9"/><circle cx="50" cy="102" r="13" fill="#ffd23f"/><path d="M37 102h26M50 89v26" fill="none" stroke-width="2"/><circle cx="40" cy="98" r="6" fill="var(--skin)"/><circle cx="60" cy="98" r="6" fill="var(--skin)"/><circle cx="20" cy="36" r="11" fill="var(--hair)"/><circle cx="80" cy="36" r="11" fill="var(--hair)"/><circle cx="50" cy="38" r="26" fill="var(--skin)"/><path d="M24 38C20 8 80 8 76 38C66 24 58 22 50 22C42 22 34 24 24 38z" fill="var(--hair)"/><circle cx="40" cy="42" r="3.5" class="eye" fill="#23275c" stroke="none"/><circle cx="60" cy="42" r="3.5" class="eye" fill="#23275c" stroke="none"/><circle cx="33" cy="50" r="4" fill="#ff9fb0" stroke="none"/><circle cx="67" cy="50" r="4" fill="#ff9fb0" stroke="none"/><path d="M41 51q9 9 18 0z" fill="#fff" stroke-width="2.5"/></g></symbol></defs></svg>
 
 <header>
   <div class="logo">📖</div>
@@ -227,6 +247,16 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
 <!-- ============ PETA ============ -->
 <section class="view active" id="peta">
+<div class="banner"><div class="btitle"><h2>Petualangan Jendela Dunia</h2><span>Bahasa Indonesia • Kelas V</span></div>
+<svg class="scene" viewBox="0 0 900 460" role="img" aria-label="Anak-anak ceria bermain di halaman sekolah"><rect width="900" height="460" fill="#8fd6ff"/>
+<circle class="sun" cx="830" cy="170" r="38" fill="#ffd23f" stroke="#23275c" stroke-width="4"/>
+<g class="cloud" fill="#fff"><ellipse cx="120" cy="150" rx="60" ry="24"/><circle cx="95" cy="132" r="24"/><circle cx="140" cy="128" r="28"/><ellipse cx="660" cy="190" rx="50" ry="20"/><circle cx="645" cy="174" r="22"/><circle cx="685" cy="170" r="24"/></g>
+<path d="M0 330C120 250 260 270 380 320C520 250 700 260 900 320V460H0z" fill="#7fd68a"/><path d="M0 380C200 340 500 360 900 350V460H0z" fill="#4cd9a0"/>
+<g stroke="#23275c" stroke-width="4" stroke-linejoin="round"><rect x="50" y="240" width="260" height="145" fill="#fff3bf"/><path d="M34 246L180 156L326 246z" fill="#ff6b6b"/><rect x="150" y="300" width="60" height="85" rx="8" fill="#6cb4ff"/><rect x="76" y="274" width="46" height="46" rx="8" fill="#c9ecff"/><rect x="238" y="274" width="46" height="46" rx="8" fill="#c9ecff"/><path d="M180 156V96" fill="none"/><g class="flag"><rect x="180" y="96" width="46" height="14" fill="#e63946"/><rect x="180" y="110" width="46" height="14" fill="#fff"/></g>
+<rect x="832" y="290" width="24" height="100" fill="#a8683a"/><circle class="leaf" cx="844" cy="262" r="58" fill="#3fbf6f"/><circle cx="500" cy="200" r="0"/></g>
+<g stroke="#23275c" stroke-width="4"><path d="M120 300h30v0" fill="none"/></g>
+<text class="tw" x="430" y="200" font-size="34">✨</text><text class="tw tw2" x="610" y="175" font-size="28">✨</text><text class="tw tw3" x="770" y="235" font-size="30">✨</text><text class="bf" x="300" y="230" font-size="36">🦋</text><use href="#boy" x="320" y="262" width="125" height="200" style="--hair:#2b1b12;--bot:#23275c;--skin:#f6c9a0"/><use href="#hij" x="440" y="262" width="125" height="200" style="--hair:#fff;--bot:#e63946;--book:#4cd9a0;--skin:#f6c9a0"/><use href="#pig" x="570" y="262" width="125" height="200" style="--hair:#3a2418;--bot:#ff7ab3;--skin:#e0a878"/><g transform="translate(820 0) scale(-1 1)"><use href="#boy" x="0" y="262" width="125" height="200" style="--hair:#2b1b12;--bot:#23275c;--skin:#c68863"/></g>
+<g stroke="#23275c" stroke-width="3"><circle cx="40" cy="420" r="9" fill="#ff7ab3"/><circle cx="90" cy="440" r="9" fill="#ffd23f"/><circle cx="270" cy="430" r="9" fill="#fff"/></g></svg></div>
   <div class="hero">
     <div class="mascot" aria-hidden="true">🦉</div>
     <div style="flex:1; min-width:220px">
@@ -238,13 +268,13 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
   </div>
 
   <div class="card yellow">
-    <h2>🎯 Tujuan Kita</h2>
+    <h2>Tujuan Kita</h2>
     <p>Kita akan belajar <b>memahami bacaan</b> dan <b>mempresentasikan buku yang kita suka</b>.</p>
     <div class="progress" style="margin-top:12px" aria-label="Kemajuan"><i id="bar"></i></div>
     <div class="badges" id="badges"></div>
   </div>
 
-  <h2 class="fun" style="margin:18px 4px 4px; color:var(--pink)">🗺️ Peta Petualangan</h2>
+  <h2 class="fun" style="margin:26px 4px 4px; color:var(--ink)">Peta Petualangan</h2>
   <div class="map">
     <button class="island i1" data-go="m1"><span class="tick">✅</span><span class="em">📮</span><b>Misi 1: Pulau Kotak Baca</b><span class="d">Kartini dan buku. Temukan informasi dari bacaan.</span></button>
     <button class="island i2" data-go="m2"><span class="tick">✅</span><span class="em">🏭</span><b>Misi 2: Pulau Penerbitan</b><span class="d">Bagaimana buku dibuat? Kenali majas metafora.</span></button>
@@ -260,9 +290,10 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
 <!-- ============ MISI 1 ============ -->
 <section class="view" id="m1">
+  <div class="strip"><svg viewBox="0 0 900 150" aria-hidden="true"><rect width="900" height="150" fill="#ffe1ee"/><text x="340" y="100" font-size="70">📮</text><text x="560" y="100" font-size="60">📚</text><text x="460" y="50" font-size="34">⭐</text><use href="#pig" x="90" y="34" width="92" height="147" style="--hair:#3a2418;--bot:#ff7ab3;--skin:#e0a878"/><use href="#hij" x="200" y="34" width="92" height="147" style="--hair:#fff;--bot:#e63946;--book:#4cd9a0;--skin:#f6c9a0"/><g transform="translate(812 0) scale(-1 1)"><use href="#boy" x="0" y="34" width="92" height="147" style="--hair:#2b1b12;--bot:#23275c;--skin:#c68863"/></g><rect y="122" width="900" height="30" fill="#4cd9a0" stroke="#23275c" stroke-width="4"/></svg></div>
   <div class="card pink">
     <span class="pill pk">Misi 1</span>
-    <h2>📮 Pulau Kotak Baca: Kartini dan Buku</h2>
+    <h2>Pulau Kotak Baca: Kartini dan Buku</h2>
     <div class="tip"><div class="m">🦉</div><div>Baca komik pendek ini. Tekan <b>🔊 Dengarkan</b> kalau mau dibacakan!</div></div>
     <div class="comic" id="comic"></div>
     <div class="dots" id="dots"></div>
@@ -275,7 +306,7 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
   <div class="card">
     <span class="pill">Aktivitas 1</span>
-    <h2>🕵️ Temukan Informasinya</h2>
+    <h2>Temukan Informasinya</h2>
     <p>Centang pernyataan yang <b>benar</b> menurut bacaan "Kotak Baca Kartini" dan "Kartini dan Ayahnya". Hati-hati, ada yang salah!</p>
     <div id="stmts"></div>
     <button class="btn green" id="stmtCheck">✅ Periksa Jawabanku</button>
@@ -284,7 +315,7 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
   <div class="card blue">
     <span class="pill">Tahukah kamu?</span>
-    <h2>💪 Kelebihan Orang yang Suka Membaca</h2>
+    <h2>Kelebihan Orang yang Suka Membaca</h2>
     <div class="benefits" id="benefits"></div>
     <p style="margin-top:12px; font-weight:700">Manfaat lain apa yang kamu rasakan dari membaca?</p>
     <textarea class="keep" id="m1-manfaat" placeholder="Tulis manfaat membaca menurutmu…"></textarea>
@@ -292,7 +323,7 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
   <div class="card purple">
     <span class="pill pu">Berdiskusi</span>
-    <h2>💬 Ayo Berdiskusi</h2>
+    <h2>Ayo Berdiskusi</h2>
     <p>Seandainya Kartini tidak suka membaca buku, masihkah dia bercita-cita mendirikan sekolah? Apa yang membuat pembaca buku punya gagasan hebat?</p>
     <textarea class="keep" id="m1-diskusi" placeholder="Tulis pendapatmu, lalu diskusikan dengan temanmu…"></textarea>
     <span class="pill pk" style="margin-top:14px">Berimajinasi</span>
@@ -304,16 +335,17 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
 <!-- ============ MISI 2 ============ -->
 <section class="view" id="m2">
+  <div class="strip"><svg viewBox="0 0 900 150" aria-hidden="true"><rect width="900" height="150" fill="#dcedff"/><text x="300" y="100" font-size="64">📖</text><text x="440" y="96" font-size="50">✏️</text><text x="520" y="100" font-size="56">🏭</text><use href="#boy" x="100" y="34" width="92" height="147" style="--hair:#2b1b12;--bot:#23275c;--skin:#f6c9a0"/><g transform="translate(822 0) scale(-1 1)"><use href="#pig" x="0" y="34" width="92" height="147" style="--hair:#3a2418;--bot:#ff7ab3;--skin:#e0a878"/></g><g transform="translate(712 0) scale(-1 1)"><use href="#hij" x="0" y="34" width="92" height="147" style="--hair:#fff;--bot:#e63946;--book:#4cd9a0;--skin:#c68863"/></g><rect y="122" width="900" height="30" fill="#4cd9a0" stroke="#23275c" stroke-width="4"/></svg></div>
   <div class="card blue">
     <span class="pill">Misi 2</span>
-    <h2>🏭 Pulau Penerbitan: Bagaimana Buku Dibuat?</h2>
+    <h2>Pulau Penerbitan: Bagaimana Buku Dibuat?</h2>
     <div class="tip"><div class="m">🦉</div><div>Buku bagus dibuat lewat proses panjang. Selesaikan <b>tiga tantangan</b> di bawah, lalu buat buku impianmu!</div></div>
   </div>
 
   <div class="card">
     <span class="sub" id="s-order"></span>
     <span class="pill">Tantangan A</span>
-    <h2>🔢 Urutkan Proses Pembuatan Buku</h2>
+    <h2>Urutkan Proses Pembuatan Buku</h2>
     <p>Tekan langkah dengan urutan yang <b>benar</b>, mulai dari langkah pertama.</p>
     <div class="msg" id="orderMsg">Langkah ke-1 apa ya?</div>
     <ol class="timeline" id="slots"></ol>
@@ -323,7 +355,7 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
   <div class="card">
     <span class="sub" id="s-match"></span>
     <span class="pill">Tantangan B</span>
-    <h2>🧩 Pasangkan Pekerjaan dan Tugasnya</h2>
+    <h2>Pasangkan Pekerjaan dan Tugasnya</h2>
     <p>Tekan satu <b>pekerjaan</b> di kiri, lalu tekan <b>tugasnya</b> di kanan.</p>
     <div class="cols"><div id="mTerms"></div><div id="mDefs"></div></div>
     <div class="msg" id="matchMsg"></div>
@@ -332,7 +364,7 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
   <div class="card">
     <span class="sub" id="s-majas"></span>
     <span class="pill gr">Tantangan C</span>
-    <h2>🔎 Pemburu Majas Metafora</h2>
+    <h2>Pemburu Majas Metafora</h2>
     <p>Majas metafora adalah kata atau kelompok kata yang <b>tidak berarti sebenarnya</b>. Pilih bagian kalimat yang berupa metafora!</p>
     <div id="majas"></div>
     <label for="m2-kalimat">✍️ Buat kalimatmu sendiri dengan kata <b>keras hati</b>:</label>
@@ -341,7 +373,7 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
   <div class="card yellow">
     <span class="pill pk">Aktivitas 4</span>
-    <h2>📚 Studio Buku Impianku</h2>
+    <h2>Studio Buku Impianku</h2>
     <p>Kalau kamu jadi penulis, buku apa yang ingin kamu tulis?</p>
     <div class="two">
       <div>
@@ -365,15 +397,16 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
 <!-- ============ MISI 3 ============ -->
 <section class="view" id="m3">
+  <div class="strip"><svg viewBox="0 0 900 150" aria-hidden="true"><rect width="900" height="150" fill="#d6f7e8"/><text x="450" y="100" font-size="76">🔍</text><text x="560" y="90" font-size="40">🐟</text><text x="360" y="100" font-size="40">🌿</text><use href="#hij" x="130" y="34" width="92" height="147" style="--hair:#ffd23f;--bot:#2f7df6;--book:#ff7ab3;--skin:#e0a878"/><g transform="translate(802 0) scale(-1 1)"><use href="#boy" x="0" y="34" width="92" height="147" style="--hair:#2b1b12;--bot:#23275c;--skin:#f6c9a0"/></g><use href="#pig" x="250" y="34" width="92" height="147" style="--hair:#3a2418;--bot:#ff7ab3;--skin:#c68863"/><rect y="122" width="900" height="30" fill="#7fd68a" stroke="#23275c" stroke-width="4"/></svg></div>
   <div class="card green">
     <span class="pill gr">Misi 3</span>
-    <h2>🔍 Pulau Detektif Bacaan</h2>
+    <h2>Pulau Detektif Bacaan</h2>
     <div class="tip"><div class="m">🦉</div><div>Kadang bacaan terasa sulit. Jadilah detektif! Tandai kata sulit dengan <b>menekan katanya</b>.</div></div>
   </div>
 
   <div class="card">
     <span class="pill gr">Langkah 1 dan 2</span>
-    <h2>🖍️ Tandai Kata yang Sulit</h2>
+    <h2>Tandai Kata yang Sulit</h2>
     <p>Baca tulisan tentang ikan di hutan mangrove ini. Tekan kata yang menurutmu sulit.</p>
     <div class="text" id="teks"></div>
     <div class="kamus" id="kamus">📖 Kamus Kiko: tekan sebuah kata untuk melihat artinya.</div>
@@ -384,21 +417,21 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
   <div class="card">
     <span class="pill gr">Langkah 3</span>
-    <h2>📓 Jurnal Detektif</h2>
+    <h2>Jurnal Detektif</h2>
     <p>Catat informasi yang menarik menurutmu.</p>
     <textarea class="keep" id="m3-jurnal" placeholder="Informasi menarik yang kutemukan…"></textarea>
   </div>
 
   <div class="card">
     <span class="pill gr">Langkah 4</span>
-    <h2>🐟 Uji Pemahamanmu</h2>
+    <h2>Uji Pemahamanmu</h2>
     <div id="m3q"></div>
   </div>
 
   <div class="card green steps">
     <span class="sub" id="s-steps"></span>
     <span class="pill gr">Rangkuman</span>
-    <h2>✅ Lima Langkah Memahami Bacaan</h2>
+    <h2>Lima Langkah Memahami Bacaan</h2>
     <p>Centang kalau kamu sudah mencobanya!</p>
     <label><input type="checkbox" class="stp"><b>1</b>Pikirkan bagian mana yang menyulitkan: kata, kalimat, atau cerita.</label>
     <label><input type="checkbox" class="stp"><b>2</b>Tandai kata dan kalimat sulit, lalu cari arti di kamus.</label>
@@ -409,7 +442,7 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
   <div class="card blue">
     <span class="pill">Rak Buku</span>
-    <h2>📚 Perpustakaan Digital Kemdikbud</h2>
+    <h2>Perpustakaan Digital Kemdikbud</h2>
     <p>Pilih buku yang kamu suka. Buku bisa dibaca gratis lewat tautan ini.</p>
     <div class="shelf">
       <a href="https://buku.kemdikbud.go.id/katalog/apa-itu" target="_blank" rel="noopener"><span>🖼️</span>Cerita bergambar<small>Gambar lebih banyak dari tulisan</small></a>
@@ -424,9 +457,10 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
 <!-- ============ PANGGUNG ============ -->
 <section class="view" id="panggung">
+  <div class="strip"><svg viewBox="0 0 900 150" aria-hidden="true"><rect width="900" height="150" fill="#ece5ff"/><text x="420" y="100" font-size="70">🎤</text><text x="520" y="70" font-size="46">🎶</text><text x="330" y="60" font-size="34">⭐</text><use href="#pig" x="100" y="34" width="92" height="147" style="--hair:#3a2418;--bot:#ff7ab3;--skin:#f6c9a0"/><use href="#boy" x="210" y="34" width="92" height="147" style="--hair:#2b1b12;--bot:#23275c;--skin:#e0a878"/><g transform="translate(792 0) scale(-1 1)"><use href="#hij" x="0" y="34" width="92" height="147" style="--hair:#fff;--bot:#e63946;--book:#4cd9a0;--skin:#f6c9a0"/></g><rect y="122" width="900" height="30" fill="#ffd23f" stroke="#23275c" stroke-width="4"/></svg></div>
   <div class="card purple no-print">
     <span class="pill pu">Aktivitas 7</span>
-    <h2>🎤 Panggung Presentasi Buku</h2>
+    <h2>Panggung Presentasi Buku</h2>
     <div class="tip"><div class="m">🦉</div><div>Pilih satu buku yang sudah kamu baca. Isi kartu ini, lalu ceritakan di depan kelas!</div></div>
   </div>
 
@@ -462,7 +496,7 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
   <div class="card yellow rubric no-print">
     <span class="sub" id="s-rubric"></span>
-    <h2>⭐ Penilaian Diri Setelah Presentasi</h2>
+    <h2>Penilaian Diri Setelah Presentasi</h2>
     <div class="r">Suaraku terdengar jelas<span class="face" data-k="a"><button>😟</button><button>😐</button><button>😄</button></span></div>
     <div class="r">Aku menceritakan isi buku dengan runtut<span class="face" data-k="b"><button>😟</button><button>😐</button><button>😄</button></span></div>
     <div class="r">Aku menyebut tokoh favorit dan alasannya<span class="face" data-k="c"><button>😟</button><button>😐</button><button>😄</button></span></div>
@@ -473,9 +507,10 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 
 <!-- ============ REFLEKSI ============ -->
 <section class="view" id="refleksi">
+  <div class="strip"><svg viewBox="0 0 900 150" aria-hidden="true"><rect width="900" height="150" fill="#fff3bf"/><text x="380" y="100" font-size="80">🌈</text><text x="500" y="56" font-size="36">⭐</text><text x="320" y="60" font-size="36">🎈</text><use href="#boy" x="90" y="34" width="92" height="147" style="--hair:#2b1b12;--bot:#23275c;--skin:#f6c9a0"/><use href="#hij" x="200" y="34" width="92" height="147" style="--hair:#ffd23f;--bot:#2f7df6;--book:#ff7ab3;--skin:#e0a878"/><g transform="translate(732 0) scale(-1 1)"><use href="#pig" x="0" y="34" width="92" height="147" style="--hair:#3a2418;--bot:#ff7ab3;--skin:#c68863"/></g><g transform="translate(832 0) scale(-1 1)"><use href="#boy" x="0" y="34" width="92" height="147" style="--hair:#2b1b12;--bot:#23275c;--skin:#e0a878"/></g><rect y="122" width="900" height="30" fill="#4cd9a0" stroke="#23275c" stroke-width="4"/></svg></div>
   <div class="card pink refl">
     <span class="pill pk">Refleksi</span>
-    <h2>🌟 Perjalanan Belajarku</h2>
+    <h2>Perjalanan Belajarku</h2>
     <p>Kita sudah sampai di akhir Bab Buku Jendela Dunia. Bagaimana perjalananmu?</p>
     <div class="r">Aku dapat menjelaskan pentingnya bacaan dalam hidup Kartini<span class="tg" data-k="1"><button class="yes">😊 Sudah bisa</button><button class="no">🌱 Masih belajar</button></span></div>
     <div class="r">Aku memahami manfaat membaca dan majas metafora<span class="tg" data-k="2"><button class="yes">😊 Sudah bisa</button><button class="no">🌱 Masih belajar</button></span></div>
@@ -493,7 +528,7 @@ footer{position:relative; z-index:1; text-align:center; font-size:.8rem; opacity
 <section class="view" id="guru">
   <div class="card">
     <span class="pill">Untuk Guru</span>
-    <h2>👩‍🏫 Panduan Guru</h2>
+    <h2>Panduan Guru</h2>
     <p>Media ini dirancang untuk mendampingi Bab 2 <i>Buku Jendela Dunia</i>, Bahasa Indonesia Kelas V (Kemendikbudristek, 2024). Data siswa hanya tersimpan di perangkat masing-masing (tanpa akun dan tanpa server).</p>
     <details open><summary>🎯 Tujuan Pembelajaran</summary>
       <p>Siswa dapat menerapkan langkah memahami bacaan dan mempresentasikan buku yang mereka sukai.</p></details>
