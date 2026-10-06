@@ -243,6 +243,14 @@ footer{position:relative;z-index:1;text-align:center;font-size:.8rem;padding:10p
 .sr .bar{flex:1 1 100px;height:20px;background:#fff;border:3px solid var(--ink);border-radius:999px;overflow:hidden}
 .sr .bar i{display:block;height:100%;background:var(--green)}
 @media print{body.ph #panggung{display:none!important}body.ph #hasil{display:block!important}body.ph .rc{box-shadow:none}}
+.team{margin-top:34px}
+.quad{display:grid;grid-template-columns:repeat(2,1fr);gap:22px 14px;margin-top:16px;max-width:560px;margin-left:auto;margin-right:auto}
+.mem{text-align:center}
+.mem .ph{position:relative;width:min(100%,160px);aspect-ratio:1;margin:0 auto 10px;border:var(--line);border-radius:50%;overflow:hidden;box-shadow:0 5px 0 var(--ink);display:flex;align-items:center;justify-content:center}
+.mem .ph::before{content:attr(data-i);font-size:3rem;font-weight:700}
+.mem img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
+.mem b{display:block;line-height:1.25}
+.mem small{display:block;font-weight:500;font-size:.85rem;line-height:1.3;margin-top:4px}
 </style>
 </head>
 <body>
@@ -297,6 +305,11 @@ footer{position:relative;z-index:1;text-align:center;font-size:.8rem;padding:10p
 
   <div style="text-align:center; margin-top:18px">
     <button class="btn ghost" data-go="guru">👩‍🏫 Panduan Guru</button>
+  </div>
+  <div class="card team">
+    <h2 class="fun" style="text-align:center">Tim Pembuat</h2>
+    <p style="text-align:center;font-weight:600">Website belajar ini dibuat dengan penuh semangat oleh:</p>
+    <div class="quad"><div class="mem"><div class="ph" style="background:var(--pink)" data-i="V"><img src="imgs/velicia2.jpg" alt="Foto Velicia Theresia Irene" loading="lazy" onerror="this.style.visibility='hidden'"></div><b>Velicia Theresia Irene</b><small>Pembuatan Materi Belajar, Web Dev & Inisiator</small></div><div class="mem"><div class="ph" style="background:var(--blue)" data-i="F"><img src="imgs/fadhilah2.jpg" alt="Foto Fadhilah Giarista Ramadhani" loading="lazy" onerror="this.style.visibility='hidden'"></div><b>Fadhilah Giarista Ramadhani</b><small>Pembuatan Laporan & Materi Belajar</small></div><div class="mem"><div class="ph" style="background:var(--green)" data-i="H"><img src="imgs/hafizhah2.jpg" alt="Foto Hafizhah Salsabilla Fesyuning" loading="lazy" onerror="this.style.visibility='hidden'"></div><b>Hafizhah Salsabilla Fesyuning</b><small>Pembuatan Laporan & Materi Belajar</small></div><div class="mem"><div class="ph" style="background:var(--purple)" data-i="R"><img src="imgs/roofid2.jpg" alt="Foto Roofid Nur Syauqi" loading="lazy" onerror="this.style.visibility='hidden'"></div><b>Roofid Nur Syauqi</b><small>Pembuatan Laporan & Materi Belajar</small></div></div>
   </div>
 </section>
 
