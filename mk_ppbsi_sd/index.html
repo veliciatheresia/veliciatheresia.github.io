@@ -232,6 +232,17 @@ footer{position:relative;z-index:1;text-align:center;font-size:.8rem;padding:10p
 .strip g use{animation-delay:-1.3s}
 .strip text{animation:peek 3s ease-in-out infinite alternate}
 @keyframes peek{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.rc{border:var(--line);border-radius:44px;padding:26px 22px;box-shadow:var(--shadow);text-align:center}
+.rc .emo{width:120px;height:120px;border-radius:50%;background:#fff;border:var(--line);font-size:3.8rem;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;animation:bounce 3s ease-in-out infinite}
+.rc h2{font-size:1.9rem}
+.rc .score{display:inline-block;background:#fff;border:3px solid var(--ink);border-radius:999px;padding:2px 22px;font-weight:700;font-size:1.4rem;margin-top:6px}
+.rc .say{background:#fff;border:3px solid var(--ink);border-radius:28px;padding:16px 20px;font-size:1.3rem;font-weight:600;margin:14px 0}
+.rc .rows{margin-top:10px}
+.sr{display:flex;align-items:center;gap:10px;margin:8px 0;text-align:left;font-weight:600;flex-wrap:wrap}
+.sr .n{flex:1 1 170px}
+.sr .bar{flex:1 1 100px;height:20px;background:#fff;border:3px solid var(--ink);border-radius:999px;overflow:hidden}
+.sr .bar i{display:block;height:100%;background:var(--green)}
+@media print{body.ph #panggung{display:none!important}body.ph #hasil{display:block!important}body.ph .rc{box-shadow:none}}
 </style>
 </head>
 <body>
@@ -272,6 +283,7 @@ footer{position:relative;z-index:1;text-align:center;font-size:.8rem;padding:10p
     <p>Kita akan belajar <b>memahami bacaan</b> dan <b>mempresentasikan buku yang kita suka</b>.</p>
     <div class="progress" style="margin-top:12px" aria-label="Kemajuan"><i id="bar"></i></div>
     <div class="badges" id="badges"></div>
+    <div id="hasilLink" class="no-print"></div>
   </div>
 
   <h2 class="fun" style="margin:26px 4px 4px; color:var(--ink)">Peta Petualangan</h2>
@@ -506,6 +518,11 @@ footer{position:relative;z-index:1;text-align:center;font-size:.8rem;padding:10p
 </section>
 
 <!-- ============ REFLEKSI ============ -->
+<section class="view" id="hasil">
+  <div id="hbox-wrap"><div id="hasilBox"></div></div>
+  <div class="no-print" style="margin-top:20px"><button class="btn green" data-go="peta">🗺️ Kembali ke Peta</button><button class="btn yellow" id="hPrint">🖨️ Cetak Kartuku</button></div>
+</section>
+
 <section class="view" id="refleksi">
   <div class="strip"><svg viewBox="0 0 900 150" aria-hidden="true"><rect width="900" height="150" fill="#fff3bf"/><text x="380" y="100" font-size="80">🌈</text><text x="500" y="56" font-size="36">⭐</text><text x="320" y="60" font-size="36">🎈</text><use href="#boy" x="90" y="34" width="92" height="147" style="--hair:#2b1b12;--bot:#23275c;--skin:#f6c9a0"/><use href="#hij" x="200" y="34" width="92" height="147" style="--hair:#ffd23f;--bot:#2f7df6;--book:#ff7ab3;--skin:#e0a878"/><g transform="translate(732 0) scale(-1 1)"><use href="#pig" x="0" y="34" width="92" height="147" style="--hair:#3a2418;--bot:#ff7ab3;--skin:#c68863"/></g><g transform="translate(832 0) scale(-1 1)"><use href="#boy" x="0" y="34" width="92" height="147" style="--hair:#2b1b12;--bot:#23275c;--skin:#e0a878"/></g><rect y="122" width="900" height="30" fill="#4cd9a0" stroke="#23275c" stroke-width="4"/></svg></div>
   <div class="card pink refl">
@@ -592,8 +609,11 @@ footer{position:relative;z-index:1;text-align:center;font-size:.8rem;padding:10p
 'use strict';
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
 const KEY='jendela-dunia-v1';
-let S={done:{},txt:{},sub:{},refl:{},face:{}};
+let S={done:{},txt:{},sub:{},refl:{},face:{},sc:{}};
 try{const r=localStorage.getItem(KEY); if(r) S=Object.assign(S,JSON.parse(r));}catch(e){}
+S.sc=S.sc||{};
+const seen=new Set();
+function miss(key,id){const k=key+id; if(seen.has(k)) return; seen.add(k); S.sc[key]=(S.sc[key]||0)+1; save();}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 function shuffle(a){a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
@@ -611,6 +631,7 @@ function stopSpeak(){try{speechSynthesis.cancel();}catch(e){}}
 /* ---------- navigasi ---------- */
 function go(id){
   if(!$('#'+id)) id='peta';
+  if(id==='hasil') renderHasil();
   $$('.view').forEach(v=>v.classList.toggle('active',v.id===id));
   $$('.tab').forEach(t=>t.classList.toggle('on',t.dataset.go===id));
   window.scrollTo({top:0,behavior:'smooth'}); stopSpeak();
@@ -624,7 +645,7 @@ const ISL={m1:0,m2:1,m3:2,p:3,r:4};
 function renderBadges(){
   $('#badges').innerHTML=BADGES.map(b=>`<div class="badge ${S.done[b[0]]?'got':''}"><span class="b">${b[1]}</span>${b[2]}</div>`).join('');
   const n=BADGES.filter(b=>S.done[b[0]]).length;
-  $('#bar').style.width=(n*20)+'%'; $('#chipProg').textContent='⭐ '+n+'/5';
+  $('#bar').style.width=(n*20)+'%'; $('#chipProg').textContent='⭐ '+n+'/5'; hasilLink();
   $$('.island').forEach((el,i)=>el.classList.toggle('done',!!S.done[BADGES[i][0]]));
 }
 function confetti(){
@@ -637,14 +658,21 @@ function done(k){
   if(S.done[k]) return;
   S.done[k]=true; save(); renderBadges(); confetti();
   const b=BADGES.find(x=>x[0]===k); toast('Lencana '+b[2]+' didapat! '+b[1]);
+  if(['m1','m2','m3','p'].every(x=>S.done[x])&&!S.done.r){setTimeout(()=>{renderHasil(); go('hasil'); confetti();},1500);}
   if(BADGES.every(x=>S.done[x[0]])){
     setTimeout(()=>{$('#mName').textContent=($('#nama').value||'Petualang'); $('#modal').classList.add('show'); confetti();},1400);
   }
 }
 $('#mClose').onclick=()=>$('#modal').classList.remove('show');
+function finalize(b){
+  if(S.sc[b]!=null) return;
+  if(b==='m2'){const e=Math.min(S.sc.eo||0,9)+Math.min(S.sc.em||0,6)+Math.min(S.sc.ej||0,4); S.sc.m2=Math.round((19-e)/19*100);}
+  if(b==='m3'){const q=Math.min(S.sc.e3||0,2), n=$$('.stp').length; S.sc.m3=Math.round((2-q+n)/(2+n)*100);}
+  save();
+}
 function subDone(group,key,total,badge){
   S.sub[key]=true; save(); const el=$('#s-'+key); if(el) el.textContent='✅';
-  if(total.every(k=>S.sub[k])) done(badge);
+  if(total.every(k=>S.sub[k])){finalize(badge); done(badge);}
 }
 
 /* ---------- simpan isian ---------- */
@@ -693,6 +721,7 @@ $('#stmtCheck').onclick=()=>{
     row.querySelector('small').textContent= ok?'':(s[1]?'Pernyataan ini benar, ayo dicentang.':'Hmm, ini salah. '+s[2]);
     if(!ok) wrong++;
   });
+  if(S.sc.m1==null){S.sc.m1=Math.round((STMT.length-wrong)/STMT.length*100); save();}
   const m=$('#stmtMsg');
   if(wrong===0){m.textContent='🎉 Hebat! Semua jawabanmu tepat!'; m.style.color='#1d8458'; done('m1');}
   else {m.textContent='Ada '+wrong+' yang belum tepat. Baca lagi komiknya, lalu coba lagi ya! 💪'; m.style.color='#c2185b';}
@@ -722,7 +751,7 @@ function renderOrder(){
     b.onclick=()=>{
       if(i===nxt){nxt++; renderOrder();
         if(nxt===ORD.length){$('#orderMsg').textContent='🎉 Urutan prosesnya sudah benar!'; subDone('m2','order',['order','match','majas'],'m2');}
-      } else {shake(b); $('#orderMsg').textContent='Belum tepat. Pikirkan: apa yang terjadi pada langkah ke-'+(nxt+1)+'?';}
+      } else {miss('eo',nxt); shake(b); $('#orderMsg').textContent='Belum tepat. Pikirkan: apa yang terjadi pada langkah ke-'+(nxt+1)+'?';}
     };
     pool.appendChild(b);
   });
@@ -749,14 +778,14 @@ function renderMatch(){
       if(!selT){toast('Pilih pekerjaan di kiri dulu ya 👈'); return;}
       if(selT.dataset.i===b.dataset.i){selT.classList.remove('sel'); selT.classList.add('ok'); b.classList.add('ok'); selT=null; matched++;
         if(matched===MATCH.length){$('#matchMsg').textContent='🎉 Semua pasangan benar!'; subDone('m2','match',['order','match','majas'],'m2');}
-      } else {shake(b); shake(selT);}
+      } else {miss('em',selT.dataset.i); shake(b); shake(selT);}
     }; D.appendChild(b);});
 }
 renderMatch();
 
 /* MCQ generik */
 function mcq(box,items,onAll){
-  let ok=0;
+  let ok=0, errs=0; const wq=new Set();
   box.innerHTML='';
   items.forEach(it=>{
     const q=document.createElement('div'); q.className='q';
@@ -766,8 +795,8 @@ function mcq(box,items,onAll){
       const b=document.createElement('button'); b.className='opt'; b.textContent=txt;
       b.onclick=()=>{
         if(q.classList.contains('done')) return;
-        if(i===it.a){b.classList.add('ok'); q.classList.add('done'); ok++; if(ok===items.length) onAll();}
-        else {shake(b); toast('Coba lagi, kamu pasti bisa! 💪');}
+        if(i===it.a){b.classList.add('ok'); q.classList.add('done'); ok++; if(ok===items.length) onAll(errs);}
+        else {shake(b); if(!wq.has(q)){wq.add(q); errs++;} toast('Coba lagi, kamu pasti bisa! 💪');}
       };
       row.appendChild(b);
     });
@@ -779,7 +808,7 @@ mcq($('#majas'),[
  {q:'2. Putri kecil itu punya pipi ranum tomat. Mana yang metafora?',o:['putri kecil','pipi ranum tomat','itu'],a:1,why:'<b>Pipi ranum tomat</b> berarti pipi yang kemerahan seperti tomat matang.'},
  {q:'3. Bagi Dina, buku adalah jendela dunia. Mana yang metafora?',o:['Dina','jendela dunia','buku'],a:1,why:'<b>Jendela dunia</b> berarti buku membuat kita tahu banyak hal di dunia.'},
  {q:'4. Adik naik darah saat mainannya direbut. Mana yang metafora?',o:['naik darah','Adik','mainannya'],a:0,why:'<b>Naik darah</b> berarti sangat marah.'}
-],()=>subDone('m2','majas',['order','match','majas'],'m2'));
+],e=>{S.sc.ej=e; save(); subDone('m2','majas',['order','match','majas'],'m2');});
 
 /* Buku impianku */
 const COLORS=['#f0156a','#3f7cb8','#2fb67c','#6b3fa0','#ff9a3d'], EMOJIS=['🐋','🚀','🐉','🏝️','🧚','🦖'];
@@ -809,7 +838,7 @@ const m3flags=['quiz','steps'];
 mcq($('#m3q'),[
  {q:'1. Kapan ikan pengunjung masuk ke hutan mangrove?',o:['Saat air pasang','Saat air surut','Setiap malam'],a:0,why:'Ikan pengunjung masuk saat air pasang untuk mencari makan.'},
  {q:'2. Ikan sembilang termasuk ikan apa?',o:['Ikan pengunjung','Ikan penetap sementara','Ikan hias'],a:1,why:'Ikan sembilang tinggal di mangrove pada salah satu fase hidupnya.'}
-],()=>subDone('m3','quiz',m3flags,'m3'));
+],e=>{S.sc.e3=e; save(); subDone('m3','quiz',m3flags,'m3');});
 $$('.stp').forEach(c=>c.addEventListener('change',()=>{
   if($$('.stp').every(x=>x.checked)) subDone('m3','steps',m3flags,'m3');
 }));
@@ -843,7 +872,7 @@ $$('.face').forEach(f=>{
 });
 $('#pDone').onclick=()=>{
   if(!$('#pk-judul').value.trim()||!$('#pk-isi').value.trim()||!$('#pk-tokoh').value.trim()){toast('Isi dulu judul, isi buku, dan tokoh favoritmu ya ✍️'); return;}
-  $('#s-rubric').textContent='✅'; done('p');
+  $('#s-rubric').textContent='✅'; S.sc.p=Math.max(S.sc.p||0,scoreP()); save(); done('p');
 };
 
 /* ============ REFLEKSI ============ */
@@ -856,6 +885,52 @@ $('#rDone').onclick=()=>{
   if(Object.keys(S.refl).length<5){toast('Pilih jawaban untuk kelima pernyataan dulu ya 😊'); return;}
   done('r'); toast('Refleksimu tersimpan 💖');
 };
+
+/* ============ KARTU HASIL ============ */
+const MIS=[['m1','📮','Misi 1 • Kotak Baca'],['m2','🏭','Misi 2 • Penerbit'],['m3','🔍','Misi 3 • Detektif'],['p','🎤','Panggung']];
+const TIERS=[
+ [90,'🏆','Bintang Pustaka','var(--yellow-soft)','Kamu seorang Bintang Pustaka yang cerdas, teliti, dan suka berbagi ilmu.','Aku pintar karena rajin membaca. Aku bangga pada diriku dan senang membantu temanku belajar!'],
+ [80,'🌟','Penjelajah Buku Hebat','var(--green-soft)','Kamu seorang Penjelajah Buku Hebat yang semangat belajar dan selalu ingin tahu.','Aku suka petualangan di dalam buku. Setiap bacaan membuat aku semakin pintar dan semakin berani!'],
+ [70,'🚀','Penulis Muda Berbakat','var(--blue-soft)','Kamu seorang Penulis Muda yang kreatif dan terus berkembang.','Aku sudah hebat dan akan semakin hebat. Aku berani mencoba hal baru dan terus berlatih!'],
+ [60,'🌱','Pembaca yang Tumbuh','var(--purple-soft)','Kamu seorang Pembaca yang sedang tumbuh dan makin kuat setiap hari.','Salah itu tidak apa-apa, karena dari situ aku belajar. Pelan-pelan aku pasti bisa!'],
+ [0,'💪','Pejuang Pantang Menyerah','var(--pink-soft)','Kamu seorang Pejuang yang berani mencoba dan tidak mudah menyerah.','Aku bangga karena sudah berusaha sampai selesai. Besok aku akan lebih baik lagi, dan aku tidak sendirian!']
+];
+const sc=k=>S.sc[k]!=null?S.sc[k]:100;
+const ready=()=>MIS.every(m=>S.done[m[0]]);
+function scoreP(){
+  const F=[['pk-judul',2],['pk-penulis',2],['pk-isi',20],['pk-tokoh',15],['pk-pendapat',15],['pk-saran',15]];
+  const t=F.reduce((a,f)=>{const n=($('#'+f[0]).value||'').trim().length; return a+(n>=f[1]?1:n>0?.5:0);},0);
+  return Math.round(t/F.length*100);
+}
+function hasilLink(){
+  $('#hasilLink').innerHTML=ready()?'<button class="btn pink" data-go="hasil">💌 Lihat Kartu Hasilku</button>':'<p style="font-weight:600;margin-top:12px">🎁 Selesaikan Misi 1, 2, 3, dan Panggung untuk membuka Kartu Hasilmu!</p>';
+}
+function renderHasil(){
+  const box=$('#hasilBox'), pr=$('#hPrint');
+  if(!ready()){
+    box.innerHTML=`<div class="card yellow"><h2>Kartu Hasilmu masih terkunci 🎁</h2><p>Selesaikan dulu: <b>${MIS.filter(m=>!S.done[m[0]]).map(m=>m[2]).join(', ')}</b>.</p></div>`;
+    pr.style.display='none'; return;
+  }
+  pr.style.display='';
+  const v=MIS.map(m=>sc(m[0])), tot=Math.round(v.reduce((a,b)=>a+b,0)/v.length), t=TIERS.find(x=>tot>=x[0]);
+  const nm=($('#nama').value||'').trim()||'Petualang';
+  const hi=MIS[v.indexOf(Math.max(...v))], lo=MIS[v.indexOf(Math.min(...v))], beda=Math.max(...v)!==Math.min(...v);
+  box.innerHTML=`<div class="rc" style="background:${t[3]}">
+    <div class="emo">${t[1]}</div>
+    <small style="font-weight:700">KARTU HASIL PETUALANGAN</small>
+    <h2>Hai, ${esc(nm)}!</h2>
+    <div class="score">Nilaimu: ${tot}</div>
+    <p style="margin-top:12px;font-size:1.25rem;font-weight:600">${t[4]}</p>
+    <h3 style="margin-top:6px">${t[1]} ${t[2]}</h3>
+    <div class="say">“${t[5]}”</div>
+    <div class="rows">${MIS.map((m,i)=>`<div class="sr"><span class="n">${m[1]} ${m[2]}</span><span class="bar"><i style="width:${v[i]}%"></i></span><b>${v[i]}</b></div>`).join('')}</div>
+    ${beda?`<p style="margin-top:12px;font-weight:600">💪 Kekuatan terbesarmu ada di <b>${hi[2]}</b>.<br>${v[MIS.indexOf(lo)]<80?`🎯 Tantangan berikutnya: mainkan lagi <b>${lo[2]}</b> supaya makin jago. Kamu pasti bisa!`:'🎯 Pertahankan semangatmu ya!'}</p>`:''}
+    <button class="btn blue no-print" id="hSpeak">🔊 Bacakan untukku</button>
+  </div>`;
+  $('#hSpeak').onclick=()=>speak(`${nm}, ${t[4]} Afirmasiku: ${t[5]}`);
+}
+$('#hPrint').onclick=()=>{document.body.classList.add('ph'); window.print();};
+window.addEventListener('afterprint',()=>document.body.classList.remove('ph'));
 
 /* ---------- mulai ---------- */
 ['m2','m3'].forEach(()=>{});
