@@ -1,0 +1,569 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Subtraction Voyage</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: sea with two lanes (one per team) on top, question card below. Every correct answer sails the ship one stop closer to the island. */
+:root{
+  --bg:#EAF5F7; --surface:#FFFFFF; --surface-2:#F1F8FA; --ink:#0F2B46; --ink-2:#4B667F; --line:#CCE0E6;
+  --accent:#0B7A9E; --on-accent:#FFFFFF;
+  --team-a:#C94A17; --team-b:#5446D8;
+  --good:#13744A; --good-bg:#DDF3E6; --bad:#B0204B; --bad-bg:#FBE4EB; --amber:#7A4F00; --amber-bg:#FFEDB8;
+  --sky-a:#CBEBF7; --sky-b:#F3FBFD; --sun:#FFC83D; --sun-glow:rgba(255,200,61,.3); --cloud:#FFFFFF;
+  --sea-1:#32B3CE; --sea-2:#1D93B5; --wave-1:#2AA3C2; --wave-2:#157FA3; --foam:#FFFFFF; --lane-line:rgba(255,255,255,.28);
+  --hull:#5A3A22; --sand:#F2D9A0; --palm:#2E8B57; --trunk:#8A5A34;
+  --font-d:'Baloo 2','Trebuchet MS',system-ui,sans-serif;
+  --font-b:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-m:'DM Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  --sail-time:3.6s;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#06132A; --surface:#0E2240; --surface-2:#12294A; --ink:#E7F2F9; --ink-2:#9BB4C8; --line:#213F63;
+    --accent:#3CC3E4; --on-accent:#04202B;
+    --team-a:#FF8A57; --team-b:#9C94FF;
+    --good:#5ED39B; --good-bg:#0F3A2B; --bad:#FF8FAB; --bad-bg:#431A2C; --amber:#F6C85A; --amber-bg:#3E3212;
+    --sky-a:#0B1B3F; --sky-b:#183563; --sun:#EEF1F8; --sun-glow:rgba(238,241,248,.18); --cloud:#2A4A7A;
+    --sea-1:#0F5675; --sea-2:#0A3F5C; --wave-1:#0D4C6B; --wave-2:#08344F; --foam:#9FD8EA; --lane-line:rgba(159,216,234,.2);
+    --hull:#B07A4A; --sand:#C9A96B; --palm:#3FAF72; --trunk:#A57445;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#06132A; --surface:#0E2240; --surface-2:#12294A; --ink:#E7F2F9; --ink-2:#9BB4C8; --line:#213F63;
+  --accent:#3CC3E4; --on-accent:#04202B;
+  --team-a:#FF8A57; --team-b:#9C94FF;
+  --good:#5ED39B; --good-bg:#0F3A2B; --bad:#FF8FAB; --bad-bg:#431A2C; --amber:#F6C85A; --amber-bg:#3E3212;
+  --sky-a:#0B1B3F; --sky-b:#183563; --sun:#EEF1F8; --sun-glow:rgba(238,241,248,.18); --cloud:#2A4A7A;
+  --sea-1:#0F5675; --sea-2:#0A3F5C; --wave-1:#0D4C6B; --wave-2:#08344F; --foam:#9FD8EA; --lane-line:rgba(159,216,234,.2);
+  --hull:#B07A4A; --sand:#C9A96B; --palm:#3FAF72; --trunk:#A57445;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--font-b);
+  padding-block:24px 40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px))}
+.app{max-width:980px;margin:0 auto;display:grid;gap:18px;min-width:0}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+h1,h2,h3{font-family:var(--font-d);margin:0;text-wrap:balance;line-height:1.1}
+p{margin:0}
+
+/* header */
+.top{display:grid;grid-template-columns:1fr minmax(0,40ch);gap:8px 28px;align-items:end}
+.kicker{font:700 12px/1.2 var(--font-b);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+h1{font-weight:800;font-size:clamp(32px,7vw,54px);margin-top:6px}
+.lead{color:var(--ink-2);font-size:15px}
+@media (max-width:720px){.top{grid-template-columns:1fr}}
+
+/* scene */
+.sea{border-radius:22px;overflow:hidden;border:1px solid var(--line);background:var(--sky-a)}
+.sky{height:48px;position:relative;background:linear-gradient(var(--sky-a),var(--sky-b));overflow:hidden}
+.sun{position:absolute;right:12%;top:8px;width:30px;height:30px;border-radius:50%;background:var(--sun);box-shadow:0 0 0 7px var(--sun-glow)}
+.cloud{position:absolute;height:12px;width:46px;border-radius:99px;background:var(--cloud);opacity:.9;animation:drift 16s ease-in-out infinite alternate}
+.cloud::before{content:"";position:absolute;left:10px;top:-7px;width:20px;height:16px;border-radius:50%;background:inherit}
+.cloud.c1{left:10%;top:22px}
+.cloud.c2{left:44%;top:10px;transform:scale(.8);animation-duration:21s}
+@keyframes drift{from{translate:0 0}to{translate:34px 0}}
+
+.lane{position:relative;background:linear-gradient(var(--sea-1),var(--sea-2));border-top:1px solid var(--lane-line)}
+.lane[data-team="a"]{--team:var(--team-a)}
+.lane[data-team="b"]{--team:var(--team-b)}
+.lane-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px 0;position:relative;z-index:4;flex-wrap:wrap}
+.chip{background:var(--surface);color:var(--ink);border-radius:999px;padding:2px 11px;font:700 13px/1.6 var(--font-b);display:inline-flex;align-items:center;gap:7px;max-width:100%}
+.chip .dotk{width:10px;height:10px;border-radius:50%;background:var(--team);flex:none}
+.chip.score{font-variant-numeric:tabular-nums}
+.lane.arrived .chip.score{background:var(--good-bg);color:var(--good)}
+
+.water{position:relative;height:100px;--sw:clamp(54px,11vw,86px);--isl:clamp(60px,14vw,118px);--track:calc(100% - var(--sw) - var(--isl) - 22px)}
+.waves{position:absolute;left:0;bottom:0;width:100%;height:22px;overflow:hidden;pointer-events:none}
+.waves svg{display:block;width:200%;height:100%;animation:flow 9s linear infinite}
+.waves path{fill:var(--wave-1)}
+.waves.back{z-index:1;bottom:16px;opacity:.55}
+.waves.back svg{animation-duration:14s;animation-direction:reverse}
+.waves.front{z-index:3}
+.waves.front path{fill:var(--wave-2)}
+@keyframes flow{to{transform:translateX(-50%)}}
+
+.buoy{position:absolute;z-index:1;bottom:14px;width:10px;height:10px;border-radius:50%;border:2px solid var(--foam);background:transparent;opacity:.85;
+  left:calc(10px + var(--k) / 5 * var(--track) + var(--sw) / 2 - 5px);transition:background .4s,border-color .4s}
+.buoy.on{background:var(--team);border-color:var(--foam);opacity:1}
+
+.ship{position:absolute;z-index:2;bottom:12px;width:var(--sw);
+  left:calc(10px + var(--p,0) * var(--track));
+  transition:left var(--sail-time) cubic-bezier(.45,.05,.3,1)}
+.lane[data-anim="off"] .ship{transition:none}
+.ship svg{display:block;width:100%;height:auto;transform-origin:50% 92%;animation:bob 3.2s ease-in-out infinite}
+.ship.oleng svg{animation:oleng .9s ease-in-out 1}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-1.6deg)}50%{transform:translateY(-3px) rotate(1.6deg)}}
+@keyframes oleng{0%{transform:rotate(0)}20%{transform:rotate(-9deg) translateY(2px)}45%{transform:rotate(8deg)}70%{transform:rotate(-5deg)}100%{transform:rotate(0)}}
+.s-sail{fill:var(--team)} .s-jib{fill:var(--foam)} .s-hull{fill:var(--hull)} .s-line{stroke:var(--foam);opacity:.75}
+.s-mast{stroke:var(--hull);stroke-width:3;stroke-linecap:round}
+
+.island{position:absolute;z-index:2;right:6px;bottom:10px;width:var(--isl)}
+.island svg{display:block;width:100%;height:auto}
+.i-sand{fill:var(--sand)} .i-palm{fill:var(--palm)} .i-trunk{stroke:var(--trunk)} .i-pole{stroke:var(--ink-2)}
+.i-flag{fill:var(--team);transform-origin:32px 46px}
+.lane.arrived .i-flag{animation:wave .7s ease-in-out infinite alternate}
+@keyframes wave{from{transform:scaleX(1)}to{transform:scaleX(.78) skewY(6deg)}}
+
+/* panel */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(16px,3.4vw,26px);display:grid;gap:18px;min-width:0}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.dots{display:flex;gap:6px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.dot.done{background:var(--ink-2)} .dot.now{background:var(--accent)}
+.eq{font:800 clamp(34px,8vw,64px)/1.1 var(--font-d);display:flex;flex-wrap:wrap;gap:.1em .35em;align-items:baseline}
+.eq .qm{color:var(--accent)} .eq .val{color:var(--good)}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.teams{grid-template-columns:1fr}}
+.tcard{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.tcard[data-team="a"]{--team:var(--team-a)} .tcard[data-team="b"]{--team:var(--team-b)}
+.tname{font:800 21px/1.15 var(--font-d);color:var(--team);overflow-wrap:anywhere}
+.ans,.field input{font:500 28px/1.2 var(--font-m);padding:10px 12px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);width:100%;min-width:0}
+.ans:focus-visible,.field input:focus-visible{border-color:var(--accent);outline-offset:0}
+.field input{font:600 18px/1.3 var(--font-b)}
+.err{color:var(--bad);font-size:14px;min-height:0}
+.err:empty{display:none}
+.btn{font:800 17px/1.2 var(--font-d);padding:11px 20px;border-radius:12px;border:0;background:var(--accent);color:var(--on-accent);cursor:pointer;align-self:flex-start}
+.btn:hover{filter:brightness(1.06)}
+.btn[disabled]{background:var(--line);color:var(--ink-2);cursor:default;filter:none}
+.locked{display:flex;align-items:center;gap:10px;font:700 17px var(--font-b);color:var(--ink);padding:10px 0}
+.locked svg{color:var(--accent);flex:none}
+.status{color:var(--ink-2);font-size:15px}
+
+.given{display:flex;flex-direction:column}
+.given .lbl{font:700 12px/1.2 var(--font-b);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.given .num{font:500 36px/1.2 var(--font-m);font-variant-numeric:tabular-nums}
+.badge{display:inline-flex;align-items:center;gap:6px;font:800 15px/1 var(--font-b);padding:7px 12px;border-radius:999px;align-self:flex-start}
+.badge.good{background:var(--good-bg);color:var(--good)} .badge.bad{background:var(--bad-bg);color:var(--bad)}
+.move{font-size:15px;color:var(--ink-2)}
+.hint{background:var(--amber-bg);color:var(--amber);border-radius:10px;padding:9px 11px;font-size:14.5px;line-height:1.45}
+.cheer{font:700 17px var(--font-b);color:var(--good)}
+
+.explain{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:clamp(14px,3vw,22px);display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 28px;align-items:start}
+.ex-head{grid-column:1/-1;display:grid;gap:6px}
+.ex-head h3{font-size:22px;font-weight:800}
+.ex-head p{color:var(--ink-2);max-width:64ch}
+.ex-work{display:grid;gap:10px;justify-items:start;overflow-x:auto;max-width:100%}
+.work{display:grid;grid-template-columns:26px repeat(var(--n),38px);font-family:var(--font-m);font-variant-numeric:tabular-nums}
+.work .c{display:flex;align-items:center;justify-content:center;font-size:28px;height:44px}
+.work .c.b{height:28px}
+.work .c.b b{font:500 14px var(--font-m);background:var(--amber-bg);color:var(--amber);border-radius:6px;padding:1px 5px}
+.work .c.t.x{color:var(--ink-2);text-decoration:line-through;text-decoration-thickness:2px}
+.work .c.op{font-size:26px;color:var(--ink-2)}
+.work .c.r{border-top:3px solid var(--ink);font-weight:500;color:var(--good)}
+.work .c.op.r{border-top-color:transparent}
+.work .c.r.z{color:transparent}
+.legend{font-size:13.5px;color:var(--ink-2);display:flex;align-items:center;gap:8px}
+.chip-y{font:500 13px var(--font-m);background:var(--amber-bg);color:var(--amber);border-radius:6px;padding:1px 6px}
+.steps{margin:0;padding-left:1.35em;display:grid;gap:10px;font-size:15.5px;line-height:1.5;max-width:64ch}
+.steps li::marker{font-weight:800;color:var(--accent)}
+.check{grid-column:1/-1;font:500 15px var(--font-m);color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px;overflow-wrap:anywhere}
+@media (max-width:760px){.explain{grid-template-columns:minmax(0,1fr)}}
+
+.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+
+/* setup + final */
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.fields{grid-template-columns:1fr}}
+.field{display:grid;gap:6px;font:700 14px var(--font-b);color:var(--ink-2)}
+.field[data-team="a"] input{border-left:6px solid var(--team-a)} .field[data-team="b"] input{border-left:6px solid var(--team-b)}
+.how{margin:0;padding-left:1.3em;display:grid;gap:6px;max-width:62ch;color:var(--ink)}
+.how li::marker{font-weight:800;color:var(--accent)}
+.final-title{font-size:clamp(28px,6vw,44px);font-weight:800}
+.strip{display:flex;gap:6px;flex-wrap:wrap}
+.pip{width:28px;height:28px;border-radius:8px;display:grid;place-items:center}
+.pip.good{background:var(--good-bg);color:var(--good)} .pip.bad{background:var(--bad-bg);color:var(--bad)}
+
+.credit{font:700 14px/1.4 var(--font-b);color:var(--ink-2);padding-top:4px}
+
+@media (prefers-reduced-motion:reduce){
+  .ship{transition-duration:.01s!important}
+  .ship svg,.waves svg,.cloud,.i-flag{animation:none!important}
+}
+</style>
+
+<main class="app">
+  <header class="top">
+    <div>
+      <p class="kicker">Subtraction practice</p>
+      <h1>Subtraction Voyage</h1>
+    </div>
+    <p class="lead">Two teams answer the same question. Every correct answer sails the ship one stop closer to the island.</p>
+  </header>
+
+  <section class="sea" id="scene" aria-label="Sailing lanes for two teams">
+    <div class="sky" aria-hidden="true"><i class="sun"></i><i class="cloud c1"></i><i class="cloud c2"></i></div>
+    <div class="lane" id="lane0" data-team="a">
+      <div class="lane-head"><span class="chip" id="laneName0"></span><span class="chip score" id="laneScore0">0 / 5 correct</span></div>
+      <div class="water"></div>
+    </div>
+    <div class="lane" id="lane1" data-team="b">
+      <div class="lane-head"><span class="chip" id="laneName1"></span><span class="chip score" id="laneScore1">0 / 5 correct</span></div>
+      <div class="water"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel"></section>
+
+  <footer class="credit">by: teacher veli</footer>
+</main>
+
+<script>
+// ==PURE==
+const QUESTIONS = [
+  {a:1876,  b:1374},
+  {a:6974,  b:5072},
+  {a:19273, b:17482},
+  {a:34810, b:20764},
+  {a:83547, b:69208}
+];
+const PLACES = ['ones','tens','hundreds','thousands','ten thousands','hundred thousands','millions'];
+const UNIT   = ['one','ten','hundred','thousand','ten thousand','hundred thousand','million'];
+const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+function listJoin(a){
+  if(a.length < 2) return a.join('');
+  if(a.length === 2) return a.join(' and ');
+  return a.slice(0,-1).join(', ') + ', and ' + a[a.length-1];
+}
+
+/* Column subtraction from right to left, recording every borrow. */
+function solve(a,b){
+  const sa = String(a), n = sa.length;
+  const A = [...sa].reverse().map(Number);
+  const B = [...String(b).padStart(n,'0')].reverse().map(Number);
+  const cur = A.slice(), work = [], res = [], steps = [];
+  for(let i=0;i<n;i++){
+    const st = {i, place:PLACES[i], unit:UNIT[i], orig:A[i], before:cur[i], bot:B[i], borrow:null};
+    if(cur[i] < B[i]){
+      let j = i+1; const zeros = [];
+      while(j < n && cur[j] === 0){ zeros.push(j); j++; }
+      if(j < n){
+        const fromBefore = cur[j];
+        cur[j] -= 1;
+        zeros.forEach(k => { cur[k] = 9; });
+        cur[i] += 10;
+        st.borrow = {from:j, fromPlace:PLACES[j], fromUnit:UNIT[j], fromBefore, fromAfter:cur[j], zeros:zeros.map(k => PLACES[k]), now:cur[i]};
+      }
+    }
+    work[i] = cur[i]; res[i] = cur[i] - B[i];
+    st.res = res[i];
+    steps.push(st);
+  }
+  return {n, A, B, work, res, steps, answer:a-b};
+}
+
+function stepText(st){
+  let t = '<b>' + cap(st.place) + '.</b> ';
+  if(st.before !== st.orig){
+    t += 'The ' + st.orig + ' in the ' + st.place + ' column became ' + st.before + ' because the column on its right borrowed from it. ';
+  }
+  if(!st.borrow){
+    t += st.before + ' − ' + st.bot + ' = ' + st.res + '.';
+    return t;
+  }
+  const b = st.borrow;
+  t += st.before + ' − ' + st.bot + ' is not possible, because ' + st.before + ' is smaller than ' + st.bot + '. ';
+  if(b.zeros.length){
+    t += 'The ' + listJoin(b.zeros) + ' ' + (b.zeros.length > 1 ? 'columns are' : 'column is') + ' 0, so ' + (b.zeros.length > 1 ? 'they' : 'it') + ' cannot lend. ' +
+         'Borrow 1 ' + b.fromUnit + ' from the ' + b.fromBefore + ' (it becomes ' + b.fromAfter + '). The 0 becomes 10, then lends 1, leaving 9. ' +
+         'The ' + st.place + ' column gets 10 more, so ' + st.before + ' becomes ' + b.now + '. ';
+  } else {
+    t += 'Borrow 1 ' + b.fromUnit + ' from the ' + b.fromBefore + ' in the ' + b.fromPlace + ' column, so it becomes ' + b.fromAfter + '. ' +
+         '1 ' + b.fromUnit + ' equals 10 ' + st.place + ', so ' + st.before + ' becomes ' + b.now + '. ';
+  }
+  t += 'Now ' + b.now + ' − ' + st.bot + ' = ' + st.res + '.';
+  return t;
+}
+
+/* A common mistake: subtracting the smaller digit from the bigger digit in every column. */
+function mistakeHint(q, ans){
+  const s = solve(q.a, q.b);
+  const first = s.steps.find(x => x.borrow);
+  if(!first) return '';
+  let swapped = 0;
+  for(let i=s.n-1;i>=0;i--) swapped = swapped*10 + Math.abs(s.A[i]-s.B[i]);
+  if(ans === swapped && ans !== s.answer){
+    return 'It looks like in the ' + first.place + ' column the smaller number was subtracted from the bigger number (' + first.bot + ' − ' + first.orig + ' = ' + (first.bot-first.orig) +
+           '). Do not flip it. The top number stays on top, so you must borrow first.';
+  }
+  return '';
+}
+// ==END PURE==
+
+(function(){
+  const $ = (s,r=document) => r.querySelector(s);
+  const panel = $('#panel');
+  const SAIL_MS = 3600;
+  const TOTAL = QUESTIONS.length;
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const DEFAULT_NAMES = ['Orange Team','Purple Team'];
+  const state = {phase:'setup', q:0, names:DEFAULT_NAMES.slice(), locked:[false,false], ans:[null,null], score:[0,0], hist:[[],[]]};
+
+  const ICON = {
+    check:'<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    cross:'<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+    lock:'<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 11V8a4 4 0 018 0v3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'
+  };
+
+  /* ---------- scene ---------- */
+  let wavePath = 'M0 12 Q25 0 50 12';
+  for(let k=2;k<=24;k++) wavePath += ' T' + (k*50) + ' 12';
+  wavePath += ' V30 H0 Z';
+  const waveSVG = cls => '<div class="waves ' + cls + '"><svg viewBox="0 0 1200 30" preserveAspectRatio="none" aria-hidden="true"><path d="' + wavePath + '"/></svg></div>';
+
+  const shipSVG = () => '<svg viewBox="0 0 120 100" aria-hidden="true">' +
+    '<path class="s-sail" d="M58 10 L58 66 L22 66 Z"/>' +
+    '<path class="s-jib" d="M64 22 L64 66 L98 66 Z"/>' +
+    '<line class="s-mast" x1="60" y1="6" x2="60" y2="72"/>' +
+    '<path class="s-sail" d="M60 4 L76 9 L60 14 Z"/>' +
+    '<path class="s-hull" d="M12 70 H108 L95 90 Q92 95 86 95 H34 Q28 95 25 90 Z"/>' +
+    '<path class="s-line" d="M16 77 H104" stroke-width="2.4" fill="none"/>' +
+    '</svg>';
+
+  const islandSVG = () => '<svg viewBox="0 0 140 100" aria-hidden="true">' +
+    '<path class="i-sand" d="M2 98 Q18 60 70 58 Q122 60 138 98 Z"/>' +
+    '<path class="i-trunk" d="M92 64 Q100 40 92 18" stroke-width="5" stroke-linecap="round" fill="none"/>' +
+    '<path class="i-palm" d="M92 18 Q76 2 54 12 Q76 10 92 18Z"/>' +
+    '<path class="i-palm" d="M92 18 Q108 0 130 10 Q108 8 92 18Z"/>' +
+    '<path class="i-palm" d="M92 18 Q78 20 62 34 Q82 26 92 18Z"/>' +
+    '<path class="i-palm" d="M92 18 Q108 22 122 36 Q104 26 92 18Z"/>' +
+    '<line class="i-pole" x1="32" y1="40" x2="32" y2="70" stroke-width="3" stroke-linecap="round"/>' +
+    '<path class="i-flag" d="M32 40 h22 l-6 7 l6 7 h-22Z"/>' +
+    '</svg>';
+
+  function buildLane(i){
+    $('#lane'+i+' .water').innerHTML =
+      waveSVG('back') +
+      [1,2,3,4].map(k => '<i class="buoy" data-k="'+k+'" style="--k:'+k+'"></i>').join('') +
+      '<div class="island">' + islandSVG() + '</div>' +
+      '<div class="ship" id="ship'+i+'">' + shipSVG() + '</div>' +
+      waveSVG('front');
+  }
+
+  function paintLane(i){
+    const lane = $('#lane'+i);
+    lane.style.setProperty('--p', state.score[i] / TOTAL);
+    lane.querySelectorAll('.buoy').forEach(b => b.classList.toggle('on', +b.dataset.k <= state.score[i]));
+    $('#laneName'+i).innerHTML = '<span class="dotk"></span>' + esc(state.names[i]);
+    $('#laneScore'+i).textContent = lane.classList.contains('arrived') ? 'Reached the island' : state.score[i] + ' / ' + TOTAL + ' correct';
+  }
+  function markArrived(i){
+    if(state.score[i] === TOTAL){ $('#lane'+i).classList.add('arrived'); paintLane(i); }
+  }
+  function wobble(i){
+    const ship = $('#ship'+i);
+    ship.classList.add('oleng');
+    ship.querySelector('svg').addEventListener('animationend', () => ship.classList.remove('oleng'), {once:true});
+  }
+  function resetLanes(){
+    [0,1].forEach(i => {
+      const lane = $('#lane'+i);
+      lane.dataset.anim = 'off';
+      lane.classList.remove('arrived');
+      paintLane(i);
+      void lane.offsetWidth;
+      delete lane.dataset.anim;
+    });
+  }
+  function showScene(){ $('#scene').scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block:'nearest'}); }
+
+  /* ---------- helpers ---------- */
+  const qHead = () => {
+    const dots = QUESTIONS.map((_,i) => {
+      const cls = (i < state.q || (i === state.q && state.phase === 'reveal')) ? 'done' : (i === state.q ? 'now' : '');
+      return '<i class="dot ' + cls + '"></i>';
+    }).join('');
+    return '<div class="qhead"><span class="kicker">Question ' + (state.q+1) + ' of ' + TOTAL + '</span><div class="dots" aria-hidden="true">' + dots + '</div></div>';
+  };
+  const eqHTML = (q, shown) => '<div class="eq" aria-label="' + fmt(q.a) + ' minus ' + fmt(q.b) + '"><span>' + fmt(q.a) + '</span><span>−</span><span>' + fmt(q.b) + '</span><span>=</span>' +
+    (shown === null ? '<span class="qm">?</span>' : '<span class="val">' + fmt(shown) + '</span>') + '</div>';
+  const teamKey = t => t ? 'b' : 'a';
+
+  /* ---------- setup ---------- */
+  function renderSetup(){
+    state.phase = 'setup';
+    panel.innerHTML =
+      '<div class="qhead"><span class="kicker">Get ready</span></div>' +
+      '<h2>Set up two teams</h2>' +
+      '<div class="fields">' +
+        '<label class="field" data-team="a" for="nameA"><span>Team 1 name</span><input id="nameA" maxlength="18" autocomplete="off" value="' + esc(state.names[0]) + '"></label>' +
+        '<label class="field" data-team="b" for="nameB"><span>Team 2 name</span><input id="nameB" maxlength="18" autocomplete="off" value="' + esc(state.names[1]) + '"></label>' +
+      '</div>' +
+      '<ol class="how">' +
+        '<li>One question appears on the screen. Each team types its own answer.</li>' +
+        '<li>Each team presses Lock answer. A locked answer is hidden.</li>' +
+        '<li>When both teams are locked, the answers open. A correct team\'s ship sails forward, and wrong answers are explained.</li>' +
+      '</ol>' +
+      '<button class="btn" id="startBtn" type="button">Start sailing</button>';
+    $('#startBtn').addEventListener('click', () => {
+      const a = $('#nameA').value.trim() || DEFAULT_NAMES[0];
+      const b = $('#nameB').value.trim() || DEFAULT_NAMES[1];
+      state.names = [a,b];
+      [0,1].forEach(paintLane);
+      renderQuestion();
+    });
+  }
+
+  /* ---------- answering ---------- */
+  function answerCard(t){
+    const nm = esc(state.names[t]);
+    if(state.locked[t]){
+      return '<div class="tcard" data-team="' + teamKey(t) + '" id="tcard'+t+'"><div class="tname">' + nm + '</div>' +
+        '<div class="locked">' + ICON.lock + '<span>Answer locked</span></div></div>';
+    }
+    return '<div class="tcard" data-team="' + teamKey(t) + '" id="tcard'+t+'"><div class="tname">' + nm + '</div>' +
+      '<label class="sr" for="ans'+t+'">Answer for ' + nm + '</label>' +
+      '<input class="ans" id="ans'+t+'" inputmode="numeric" autocomplete="off" placeholder="Type answer" maxlength="8">' +
+      '<p class="err" id="err'+t+'" role="alert"></p>' +
+      '<button class="btn" id="lock'+t+'" type="button">Lock answer</button></div>';
+  }
+  function bindCard(t){
+    const inp = $('#ans'+t);
+    inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g,''); $('#err'+t).textContent = ''; });
+    inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); lockAnswer(t); } });
+    $('#lock'+t).addEventListener('click', () => lockAnswer(t));
+  }
+  function statusText(){
+    const waiting = [0,1].filter(t => !state.locked[t]).map(t => esc(state.names[t]));
+    if(waiting.length === 2) return 'Waiting for both teams to lock their answers.';
+    return 'Waiting for ' + waiting[0] + '.';
+  }
+  function renderQuestion(){
+    state.phase = 'answer'; state.locked = [false,false]; state.ans = [null,null];
+    const q = QUESTIONS[state.q];
+    panel.innerHTML = qHead() + eqHTML(q, null) +
+      '<div class="teams">' + answerCard(0) + answerCard(1) + '</div>' +
+      '<p class="status" id="status" role="status">' + statusText() + '</p>';
+    bindCard(0); bindCard(1);
+    $('#ans0').focus({preventScroll:true});
+  }
+  function lockAnswer(t){
+    if(state.phase !== 'answer' || state.locked[t]) return;
+    const inp = $('#ans'+t);
+    const digits = inp.value.replace(/\D/g,'');
+    if(!digits){ $('#err'+t).textContent = 'Type an answer before locking.'; inp.focus(); return; }
+    state.ans[t] = parseInt(digits,10);
+    state.locked[t] = true;
+    $('#tcard'+t).outerHTML = answerCard(t);
+    if(state.locked[0] && state.locked[1]){
+      state.phase = 'opening';
+      $('#status').textContent = 'Both teams are locked. Opening answers...';
+      setTimeout(reveal, 1300);
+    } else {
+      $('#status').innerHTML = statusText();
+      const other = state.locked[0] ? 1 : 0;
+      const oi = $('#ans'+other); if(oi) oi.focus({preventScroll:true});
+    }
+  }
+
+  /* ---------- reveal ---------- */
+  function workGrid(s, q){
+    const lenB = String(q.b).length, lenR = String(s.answer).length;
+    const cols = [...Array(s.n).keys()].reverse();
+    const cell = (cls, html) => '<span class="c ' + cls + '">' + html + '</span>';
+    return '<div class="work" style="--n:' + s.n + '" role="img" aria-label="Column subtraction: ' + fmt(q.a) + ' minus ' + fmt(q.b) + '">' +
+      cell('op','') + cols.map(i => cell('b', s.work[i] !== s.A[i] ? '<b>' + s.work[i] + '</b>' : '')).join('') +
+      cell('op','') + cols.map(i => cell('t' + (s.work[i] !== s.A[i] ? ' x' : ''), s.A[i])).join('') +
+      cell('op','−') + cols.map(i => cell('m', i < lenB ? s.B[i] : '')).join('') +
+      cell('op r','') + cols.map(i => cell('r' + (i >= lenR ? ' z' : ''), s.res[i])).join('') +
+      '</div>';
+  }
+  function explanationHTML(q){
+    const s = solve(q.a, q.b);
+    const bc = s.steps.filter(x => x.borrow).map(x => x.place);
+    const intro = bc.length
+      ? 'This problem needs borrowing in the ' + listJoin(bc) + ' ' + (bc.length > 1 ? 'columns' : 'column') + '. When the top digit is smaller than the bottom digit, borrow 1 from the column on its left.'
+      : 'This problem does not need borrowing. In every column the top digit is equal to or bigger than the bottom digit, so subtract column by column from the right.';
+    return '<section class="explain" aria-labelledby="exTitle">' +
+      '<div class="ex-head"><h3 id="exTitle">How to solve ' + fmt(q.a) + ' − ' + fmt(q.b) + '</h3><p>' + intro + '</p></div>' +
+      '<div class="ex-work">' + workGrid(s, q) +
+        (bc.length ? '<p class="legend"><b class="chip-y">17</b> yellow number = new value after borrowing</p>' : '') + '</div>' +
+      '<ol class="steps">' + s.steps.map(st => '<li>' + stepText(st) + '</li>').join('') + '</ol>' +
+      '<p class="check">Check with addition: ' + fmt(s.answer) + ' + ' + fmt(q.b) + ' = ' + fmt(q.a) + '</p>' +
+    '</section>';
+  }
+  function resultCard(t, ok, q){
+    const hint = ok ? '' : mistakeHint(q, state.ans[t]);
+    return '<div class="tcard" data-team="' + teamKey(t) + '">' +
+      '<div class="tname">' + esc(state.names[t]) + '</div>' +
+      '<div class="given"><span class="lbl">Answer</span><span class="num">' + fmt(state.ans[t]) + '</span></div>' +
+      '<span class="badge ' + (ok ? 'good' : 'bad') + '">' + (ok ? ICON.check + 'Correct' : ICON.cross + 'Wrong') + '</span>' +
+      '<p class="move">' + (ok ? 'The ship sails forward one stop.' : 'The ship stays where it is.') + '</p>' +
+      (hint ? '<p class="hint">' + hint + '</p>' : '') + '</div>';
+  }
+  function reveal(){
+    if(state.phase !== 'opening') return;
+    state.phase = 'reveal';
+    const q = QUESTIONS[state.q], answer = q.a - q.b;
+    const ok = state.ans.map(v => v === answer);
+    state.hist[0].push(ok[0]); state.hist[1].push(ok[1]);
+    const anyWrong = ok.some(x => !x), anyMove = ok.some(Boolean);
+    const last = state.q === TOTAL - 1;
+    const sum = state.names.map((n,t) => n + (ok[t] ? ' correct' : ' wrong')).join(', ');
+    panel.innerHTML = qHead() + eqHTML(q, answer) +
+      '<p class="sr" role="status">Results: ' + esc(sum) + '.</p>' +
+      '<div class="teams">' + resultCard(0, ok[0], q) + resultCard(1, ok[1], q) + '</div>' +
+      (anyWrong ? explanationHTML(q) : '<p class="cheer">Both teams are correct. Both ships sail one stop.</p>') +
+      '<div class="actions"><button class="btn" id="nextBtn" type="button" disabled>' + (anyMove ? 'Ship is sailing...' : (last ? 'See results' : 'Next question')) + '</button></div>';
+    showScene();
+    const nextBtn = $('#nextBtn');
+    const enable = () => { nextBtn.disabled = false; nextBtn.textContent = last ? 'See results' : 'Next question'; };
+    nextBtn.addEventListener('click', () => {
+      if(last){ renderFinal(); }
+      else { state.q++; renderQuestion(); showScene(); }
+    });
+    setTimeout(() => {
+      [0,1].forEach(t => {
+        if(ok[t]){ state.score[t]++; paintLane(t); } else { wobble(t); }
+      });
+    }, 700);
+    if(anyMove){
+      setTimeout(() => { [0,1].forEach(markArrived); enable(); }, 700 + (reduced ? 300 : SAIL_MS + 200));
+    } else {
+      enable();
+    }
+  }
+
+  /* ---------- final ---------- */
+  function renderFinal(){
+    state.phase = 'final';
+    const [a,b] = state.score;
+    let title;
+    if(a === b) title = a === TOTAL ? 'Both ships reached the island' : 'It\'s a tie';
+    else title = esc(state.names[a > b ? 0 : 1]) + ' wins';
+    const card = t => {
+      const s = state.score[t];
+      const strip = state.hist[t].map((ok,i) => '<span class="pip ' + (ok ? 'good' : 'bad') + '" role="img" aria-label="Question ' + (i+1) + (ok ? ' correct' : ' wrong') + '">' + (ok ? ICON.check : ICON.cross) + '</span>').join('');
+      return '<div class="tcard" data-team="' + teamKey(t) + '"><div class="tname">' + esc(state.names[t]) + '</div>' +
+        '<div class="given"><span class="lbl">Correct answers</span><span class="num">' + s + ' of ' + TOTAL + '</span></div>' +
+        '<div class="strip">' + strip + '</div>' +
+        '<p class="move">' + (s === TOTAL ? 'The ship reached the island.' : 'The ship stopped at stop ' + s + ' of ' + TOTAL + '.') + '</p></div>';
+    };
+    panel.innerHTML =
+      '<div class="qhead"><span class="kicker">Voyage complete</span></div>' +
+      '<h2 class="final-title">' + title + '</h2>' +
+      '<div class="teams">' + card(0) + card(1) + '</div>' +
+      '<div class="actions"><button class="btn" id="againBtn" type="button">Play again</button></div>';
+    $('#againBtn').addEventListener('click', () => {
+      state.q = 0; state.score = [0,0]; state.hist = [[],[]];
+      resetLanes();
+      renderSetup();
+      showScene();
+    });
+  }
+
+  buildLane(0); buildLane(1);
+  [0,1].forEach(paintLane);
+  renderSetup();
+})();
+</script>
+
+</body></html>
