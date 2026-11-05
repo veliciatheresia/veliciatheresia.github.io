@@ -5,10 +5,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* Layout: sea with two lanes (one per team) on top, question card below. Every correct answer sails the ship one stop closer to the island. */
+/* Layout: sea with two lanes (one per team) on top; below, the problem is written vertically on a board with the two answer cards beside it. Every correct answer sails the ship one stop closer to the island. */
 :root{
   --bg:#EAF5F7; --surface:#FFFFFF; --surface-2:#F1F8FA; --ink:#0F2B46; --ink-2:#4B667F; --line:#CCE0E6;
-  --accent:#0B7A9E; --on-accent:#FFFFFF;
+  --accent:#0B7A9E; --on-accent:#FFFFFF; --accent-soft:#D9F0F6;
   --team-a:#C94A17; --team-b:#5446D8;
   --good:#13744A; --good-bg:#DDF3E6; --bad:#B0204B; --bad-bg:#FBE4EB; --amber:#7A4F00; --amber-bg:#FFEDB8;
   --sky-a:#CBEBF7; --sky-b:#F3FBFD; --sun:#FFC83D; --sun-glow:rgba(255,200,61,.3); --cloud:#FFFFFF;
@@ -22,7 +22,7 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#06132A; --surface:#0E2240; --surface-2:#12294A; --ink:#E7F2F9; --ink-2:#9BB4C8; --line:#213F63;
-    --accent:#3CC3E4; --on-accent:#04202B;
+    --accent:#3CC3E4; --on-accent:#04202B; --accent-soft:#12384F;
     --team-a:#FF8A57; --team-b:#9C94FF;
     --good:#5ED39B; --good-bg:#0F3A2B; --bad:#FF8FAB; --bad-bg:#431A2C; --amber:#F6C85A; --amber-bg:#3E3212;
     --sky-a:#0B1B3F; --sky-b:#183563; --sun:#EEF1F8; --sun-glow:rgba(238,241,248,.18); --cloud:#2A4A7A;
@@ -33,7 +33,7 @@
 }
 :root[data-theme="dark"]{
   --bg:#06132A; --surface:#0E2240; --surface-2:#12294A; --ink:#E7F2F9; --ink-2:#9BB4C8; --line:#213F63;
-  --accent:#3CC3E4; --on-accent:#04202B;
+  --accent:#3CC3E4; --on-accent:#04202B; --accent-soft:#12384F;
   --team-a:#FF8A57; --team-b:#9C94FF;
   --good:#5ED39B; --good-bg:#0F3A2B; --bad:#FF8FAB; --bad-bg:#431A2C; --amber:#F6C85A; --amber-bg:#3E3212;
   --sky-a:#0B1B3F; --sky-b:#183563; --sun:#EEF1F8; --sun-glow:rgba(238,241,248,.18); --cloud:#2A4A7A;
@@ -50,7 +50,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--font
 .app{max-width:980px;margin:0 auto;display:grid;gap:18px;min-width:0}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-h1,h2,h3{font-family:var(--font-d);margin:0;text-wrap:balance;line-height:1.1}
+h1,h2,h3,h4{font-family:var(--font-d);margin:0;text-wrap:balance;line-height:1.1}
 p{margin:0}
 
 /* header */
@@ -117,12 +117,54 @@ h1{font-weight:800;font-size:clamp(32px,7vw,54px);margin-top:6px}
 .dots{display:flex;gap:6px}
 .dot{width:10px;height:10px;border-radius:50%;background:var(--line)}
 .dot.done{background:var(--ink-2)} .dot.now{background:var(--accent)}
-.eq{font:800 clamp(34px,8vw,64px)/1.1 var(--font-d);display:flex;flex-wrap:wrap;gap:.1em .35em;align-items:baseline}
-.eq .qm{color:var(--accent)} .eq .val{color:var(--good)}
-.teams{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media (max-width:640px){.teams{grid-template-columns:1fr}}
+
+.stage{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px 28px;align-items:start}
+@media (max-width:760px){.stage{grid-template-columns:minmax(0,1fr)}}
+.boardwrap{display:grid;gap:12px;justify-items:start;min-width:0;max-width:100%}
+.stage .teams{grid-template-columns:minmax(0,1fr)}
+
+/* the vertical problem */
+.board{--cw:clamp(42px,10.5vw,60px);--ch:clamp(48px,11vw,62px);--fs:clamp(30px,7.5vw,44px);
+  display:grid;grid-template-columns:30px repeat(var(--n),var(--cw));font-family:var(--font-m);font-variant-numeric:tabular-nums;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:12px 14px 14px;max-width:100%;overflow-x:auto}
+.board .c{position:relative;display:flex;align-items:center;justify-content:center;font-size:var(--fs);height:var(--ch)}
+.board .c.lab{height:20px;font:500 11px var(--font-m);color:var(--ink-2)}
+.board .c.b{height:50px}
+.board.nob .c.b{height:6px}
+.board .c.cur{background:var(--accent-soft);border-radius:8px}
+.board .ansbox .c.cur{border-radius:0}
+.board.mini-board{--cw:clamp(38px,9vw,46px);--ch:44px;--fs:28px;padding:8px 10px 10px;width:max-content}
+.board.mini-board .c.b{height:40px}
+.board.mini-board .c.lab{height:18px}
+.board.mini-board.nob .c.b{height:6px}
+.board.mini-board .circ{min-width:32px;height:32px;font-size:16px}
+.stepboard{margin-top:10px;max-width:100%;overflow-x:auto}
+.calc{margin-top:8px;display:inline-block;font:500 16px var(--font-m);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px 10px}
+.calc b{color:var(--good)}
+.board .c.op{color:var(--ink-2)}
+.board .c.r{border-top:4px solid var(--ink);color:var(--good);font-weight:500}
+.board .c.op.r{border-top-color:transparent}
+.board .c.r.z{color:transparent}
+.board .ansbox{grid-column:2 / -1;display:grid;grid-template-columns:repeat(var(--n),var(--cw));margin-top:10px;background:var(--surface);border:2px solid var(--line);border-radius:12px;overflow:hidden}
+.board .ansbox .c.r{border-top:0;height:calc(var(--ch) - 4px)}
+.board .c.r.q{color:var(--accent);font-family:var(--font-d);font-weight:800;justify-content:flex-start;padding-left:calc(var(--cw) * .25)}
+.board .c.gc::after{content:",";position:absolute;right:-3px;bottom:8px;font-size:.55em;color:var(--ink-2)}
+.board .c.r.z::after{display:none}
+.board.show-circles .c.t.x::before{content:"";position:absolute;left:50%;top:50%;width:3px;height:74%;background:var(--bad);border-radius:2px;transform:translate(-50%,-50%) rotate(40deg)}
+.board:not(.show-circles) .circ{visibility:hidden}
+
+.circ{position:relative;display:inline-grid;place-items:center;min-width:38px;height:38px;padding:0 5px;border-radius:50%;border:2px solid var(--bad);
+  background:var(--bad-bg);color:var(--bad);font:600 19px/1 var(--font-m)}
+.circ.small{min-width:28px;height:28px;font-size:14px;border-width:2px}
+
+.legend{font-size:13.5px;color:var(--ink-2);display:flex;align-items:center;gap:10px;max-width:44ch}
+.legend .circ{flex:none}
+.hintbox{background:var(--amber-bg);color:var(--amber);border-radius:12px;padding:10px 12px;font-size:14.5px;line-height:1.45;max-width:44ch}
+
 .tcard{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .tcard[data-team="a"]{--team:var(--team-a)} .tcard[data-team="b"]{--team:var(--team-b)}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.teams{grid-template-columns:1fr}}
 .tname{font:800 21px/1.15 var(--font-d);color:var(--team);overflow-wrap:anywhere}
 .ans,.field input{font:500 28px/1.2 var(--font-m);padding:10px 12px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);width:100%;min-width:0}
 .ans:focus-visible,.field input:focus-visible{border-color:var(--accent);outline-offset:0}
@@ -131,6 +173,7 @@ h1{font-weight:800;font-size:clamp(32px,7vw,54px);margin-top:6px}
 .err:empty{display:none}
 .btn{font:800 17px/1.2 var(--font-d);padding:11px 20px;border-radius:12px;border:0;background:var(--accent);color:var(--on-accent);cursor:pointer;align-self:flex-start}
 .btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);padding:8px 16px;font-size:16px}
 .btn[disabled]{background:var(--line);color:var(--ink-2);cursor:default;filter:none}
 .locked{display:flex;align-items:center;gap:10px;font:700 17px var(--font-b);color:var(--ink);padding:10px 0}
 .locked svg{color:var(--accent);flex:none}
@@ -145,26 +188,23 @@ h1{font-weight:800;font-size:clamp(32px,7vw,54px);margin-top:6px}
 .hint{background:var(--amber-bg);color:var(--amber);border-radius:10px;padding:9px 11px;font-size:14.5px;line-height:1.45}
 .cheer{font:700 17px var(--font-b);color:var(--good)}
 
-.explain{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:clamp(14px,3vw,22px);display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 28px;align-items:start}
-.ex-head{grid-column:1/-1;display:grid;gap:6px}
+/* explanation flows downward, one step under another */
+.explain{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:clamp(14px,3vw,22px);display:grid;gap:16px}
+.ex-head{display:grid;gap:6px}
 .ex-head h3{font-size:22px;font-weight:800}
 .ex-head p{color:var(--ink-2);max-width:64ch}
-.ex-work{display:grid;gap:10px;justify-items:start;overflow-x:auto;max-width:100%}
-.work{display:grid;grid-template-columns:26px repeat(var(--n),38px);font-family:var(--font-m);font-variant-numeric:tabular-nums}
-.work .c{display:flex;align-items:center;justify-content:center;font-size:28px;height:44px}
-.work .c.b{height:28px}
-.work .c.b b{font:500 14px var(--font-m);background:var(--amber-bg);color:var(--amber);border-radius:6px;padding:1px 5px}
-.work .c.t.x{color:var(--ink-2);text-decoration:line-through;text-decoration-thickness:2px}
-.work .c.op{font-size:26px;color:var(--ink-2)}
-.work .c.r{border-top:3px solid var(--ink);font-weight:500;color:var(--good)}
-.work .c.op.r{border-top-color:transparent}
-.work .c.r.z{color:transparent}
-.legend{font-size:13.5px;color:var(--ink-2);display:flex;align-items:center;gap:8px}
-.chip-y{font:500 13px var(--font-m);background:var(--amber-bg);color:var(--amber);border-radius:6px;padding:1px 6px}
-.steps{margin:0;padding-left:1.35em;display:grid;gap:10px;font-size:15.5px;line-height:1.5;max-width:64ch}
-.steps li::marker{font-weight:800;color:var(--accent)}
-.check{grid-column:1/-1;font:500 15px var(--font-m);color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px;overflow-wrap:anywhere}
-@media (max-width:760px){.explain{grid-template-columns:minmax(0,1fr)}}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{position:relative;counter-increment:s;padding:0 0 20px 48px;min-width:0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:800 16px var(--font-d)}
+.steps li::after{content:"";position:absolute;left:16px;top:38px;bottom:4px;width:2px;background:var(--line)}
+.steps li:last-child{padding-bottom:0}
+.steps li:last-child::after{display:none}
+.steps h4{font-size:18px;font-weight:800;margin-bottom:2px}
+.steps p{font-size:15.5px;line-height:1.5;max-width:64ch}
+.mini{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;font:500 14px var(--font-m)}
+.pill{font:800 12px var(--font-b);text-transform:uppercase;letter-spacing:.06em;background:var(--amber-bg);color:var(--amber);border-radius:999px;padding:4px 10px}
+.mv{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px 9px}
+.check{font:500 15px var(--font-m);color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px;overflow-wrap:anywhere}
 
 .actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 
@@ -239,6 +279,7 @@ function solve(a,b){
   const A = [...sa].reverse().map(Number);
   const B = [...String(b).padStart(n,'0')].reverse().map(Number);
   const cur = A.slice(), work = [], res = [], steps = [];
+  const lent = Array(n).fill(false), borrowed = Array(n).fill(false);
   for(let i=0;i<n;i++){
     const st = {i, place:PLACES[i], unit:UNIT[i], orig:A[i], before:cur[i], bot:B[i], borrow:null};
     if(cur[i] < B[i]){
@@ -246,26 +287,26 @@ function solve(a,b){
       while(j < n && cur[j] === 0){ zeros.push(j); j++; }
       if(j < n){
         const fromBefore = cur[j];
-        cur[j] -= 1;
-        zeros.forEach(k => { cur[k] = 9; });
-        cur[i] += 10;
+        cur[j] -= 1; lent[j] = true;
+        zeros.forEach(k => { cur[k] = 9; lent[k] = true; borrowed[k] = true; });
+        cur[i] += 10; borrowed[i] = true;
         st.borrow = {from:j, fromPlace:PLACES[j], fromUnit:UNIT[j], fromBefore, fromAfter:cur[j], zeros:zeros.map(k => PLACES[k]), now:cur[i]};
       }
     }
     work[i] = cur[i]; res[i] = cur[i] - B[i];
-    st.res = res[i];
+    st.res = res[i]; st.snap = cur.slice();
     steps.push(st);
   }
-  return {n, A, B, work, res, steps, answer:a-b};
+  return {n, A, B, work, res, steps, lent, borrowed, answer:a-b};
 }
 
 function stepText(st){
-  let t = '<b>' + cap(st.place) + '.</b> ';
+  let t = '';
   if(st.before !== st.orig){
-    t += 'The ' + st.orig + ' in the ' + st.place + ' column became ' + st.before + ' because the column on its right borrowed from it. ';
+    t += 'The ' + st.orig + ' in this column became ' + st.before + ' because the column on its right borrowed from it. ';
   }
   if(!st.borrow){
-    t += st.before + ' − ' + st.bot + ' = ' + st.res + '.';
+    t += 'No borrowing needed here. Subtract directly.';
     return t;
   }
   const b = st.borrow;
@@ -273,13 +314,32 @@ function stepText(st){
   if(b.zeros.length){
     t += 'The ' + listJoin(b.zeros) + ' ' + (b.zeros.length > 1 ? 'columns are' : 'column is') + ' 0, so ' + (b.zeros.length > 1 ? 'they' : 'it') + ' cannot lend. ' +
          'Borrow 1 ' + b.fromUnit + ' from the ' + b.fromBefore + ' (it becomes ' + b.fromAfter + '). The 0 becomes 10, then lends 1, leaving 9. ' +
-         'The ' + st.place + ' column gets 10 more, so ' + st.before + ' becomes ' + b.now + '. ';
+         'This column gets 10 more, so ' + st.before + ' becomes ' + b.now + '.';
   } else {
     t += 'Borrow 1 ' + b.fromUnit + ' from the ' + b.fromBefore + ' in the ' + b.fromPlace + ' column, so it becomes ' + b.fromAfter + '. ' +
-         '1 ' + b.fromUnit + ' equals 10 ' + st.place + ', so ' + st.before + ' becomes ' + b.now + '. ';
+         '1 ' + b.fromUnit + ' equals 10 ' + st.place + ', so ' + st.before + ' becomes ' + b.now + '.';
   }
-  t += 'Now ' + b.now + ' − ' + st.bot + ' = ' + st.res + '.';
   return t;
+}
+
+/* Small visual under each step: circles show the number after borrowing. */
+function stepMini(st){
+  if(!st.borrow){
+    return '<div class="mini"><span class="mv">' + st.before + ' − ' + st.bot + ' = <b>' + st.res + '</b></span></div>';
+  }
+  const b = st.borrow;
+  return '<div class="mini"><span class="pill">Borrow 1</span>' +
+    '<span class="mv">' + b.fromPlace + ': ' + b.fromBefore + ' → <span class="circ small">' + b.fromAfter + '</span></span>' +
+    '<span class="mv">' + st.place + ': ' + st.before + ' → <span class="circ small">' + b.now + '</span></span>' +
+    '<span class="mv">' + b.now + ' − ' + st.bot + ' = <b>' + st.res + '</b></span></div>';
+}
+
+function hintText(q){
+  const s = solve(q.a, q.b);
+  const bc = s.steps.filter(x => x.borrow).map(x => x.place);
+  if(!bc.length) return 'Hint: no borrowing is needed here. Subtract column by column, starting from the ones.';
+  return 'Hint: start from the ones. You need to borrow in the ' + listJoin(bc) + ' ' + (bc.length > 1 ? 'columns' : 'column') +
+         '. Each circle shows the new number after borrowing.';
 }
 
 /* A common mistake: subtracting the smaller digit from the bigger digit in every column. */
@@ -383,9 +443,50 @@ function mistakeHint(q, ans){
     }).join('');
     return '<div class="qhead"><span class="kicker">Question ' + (state.q+1) + ' of ' + TOTAL + '</span><div class="dots" aria-hidden="true">' + dots + '</div></div>';
   };
-  const eqHTML = (q, shown) => '<div class="eq" aria-label="' + fmt(q.a) + ' minus ' + fmt(q.b) + '"><span>' + fmt(q.a) + '</span><span>−</span><span>' + fmt(q.b) + '</span><span>=</span>' +
-    (shown === null ? '<span class="qm">?</span>' : '<span class="val">' + fmt(shown) + '</span>') + '</div>';
   const teamKey = t => t ? 'b' : 'a';
+
+  /* The problem written vertically, like on paper. */
+  const LABELS = ['1','10','100','1K','10K','100K','1M'];
+  function boardHTML(q, reveal){
+    const s = solve(q.a, q.b);
+    const lenB = String(q.b).length, lenR = String(s.answer).length;
+    const cols = [...Array(s.n).keys()].reverse();
+    const cell = (cls, html) => '<span class="c ' + cls + '">' + html + '</span>';
+    const gc = (i, ok) => (ok && i > 0 && i % 3 === 0) ? ' gc' : '';
+    const tag = i => (s.borrowed[i] && s.lent[i]) ? '+10 −1' : (s.borrowed[i] ? '+10' : '−1');
+    const role = i => s.borrowed[i] ? 'recv' : 'lent';
+    const changed = i => s.work[i] !== s.A[i];
+    return '<div class="board' + (s.steps.some(x => x.borrow) ? '' : ' nob') + '" id="board" style="--n:' + s.n + '" role="img" aria-label="Subtraction problem: ' + fmt(q.a) + ' minus ' + fmt(q.b) + (reveal ? ', equals ' + fmt(s.answer) : '') + '">' +
+      cell('op','') + cols.map(i => cell('lab', LABELS[i])).join('') +
+      cell('op','') + cols.map(i => cell('b', changed(i) ? '<span class="circ">' + s.work[i] + '</span>' : '')).join('') +
+      cell('op','') + cols.map(i => cell('t' + (changed(i) ? ' x' : '') + gc(i,true), s.A[i])).join('') +
+      cell('op','−') + cols.map(i => cell('m' + gc(i, i < lenB), i < lenB ? s.B[i] : '')).join('') +
+      cell('op r','') +
+      (reveal
+        ? '<span class="ansbox">' + cols.map(i => cell('r' + (i >= lenR ? ' z' : '') + gc(i, i < lenR), s.res[i])).join('') + '</span>'
+        : '<span class="c r q" style="grid-column:2 / -1">?</span>') +
+      '</div>';
+  }
+  /* The board as it looks right after one step, so the solution builds up downward. */
+  function stepBoard(q, k){
+    const s = solve(q.a, q.b), snap = s.steps[k].snap;
+    const lenB = String(q.b).length, lenR = String(s.answer).length;
+    const cols = [...Array(s.n).keys()].reverse();
+    const cell = (cls, html) => '<span class="c ' + cls + '">' + html + '</span>';
+    const gc = (i, ok) => (ok && i > 0 && i % 3 === 0) ? ' gc' : '';
+    const cu = i => i === k ? ' cur' : '';
+    const ch = i => snap[i] !== s.A[i];
+    const any = cols.some(ch);
+    return '<div class="board show-circles mini-board' + (any ? '' : ' nob') + '" style="--n:' + s.n + '" role="img" aria-label="Board after step ' + (k+1) + '">' +
+      cell('op','') + cols.map(i => cell('lab' + cu(i), LABELS[i])).join('') +
+      cell('op','') + cols.map(i => cell('b' + cu(i), ch(i) ? '<span class="circ">' + snap[i] + '</span>' : '')).join('') +
+      cell('op','') + cols.map(i => cell('t' + (ch(i) ? ' x' : '') + gc(i,true) + cu(i), s.A[i])).join('') +
+      cell('op','−') + cols.map(i => cell('m' + gc(i, i < lenB) + cu(i), i < lenB ? s.B[i] : '')).join('') +
+      cell('op r','') +
+      '<span class="ansbox">' + cols.map(i => cell('r' + (i >= lenR ? ' z' : '') + gc(i, i < lenR && i <= k) + cu(i), i <= k ? s.res[i] : '')).join('') + '</span>' +
+      '</div>';
+  }
+  const legendHTML = () => '<p class="legend" id="legend"><span class="circ small">17</span><span>Red circle = the new number after borrowing. The old number is crossed out.</span></p>';
 
   /* ---------- setup ---------- */
   function renderSetup(){
@@ -398,9 +499,9 @@ function mistakeHint(q, ans){
         '<label class="field" data-team="b" for="nameB"><span>Team 2 name</span><input id="nameB" maxlength="18" autocomplete="off" value="' + esc(state.names[1]) + '"></label>' +
       '</div>' +
       '<ol class="how">' +
-        '<li>One question appears on the screen. Each team types its own answer.</li>' +
-        '<li>Each team presses Lock answer. A locked answer is hidden.</li>' +
-        '<li>When both teams are locked, the answers open. A correct team\'s ship sails forward, and wrong answers are explained.</li>' +
+        '<li>One problem appears on the board. Each team types its own answer.</li>' +
+        '<li>Each team presses Lock answer. A locked answer is hidden. Press Show hint if you need help.</li>' +
+        '<li>When both teams are locked, the answers open. A correct team\'s ship sails forward, and wrong answers are explained step by step.</li>' +
       '</ol>' +
       '<button class="btn" id="startBtn" type="button">Start sailing</button>';
     $('#startBtn').addEventListener('click', () => {
@@ -439,10 +540,23 @@ function mistakeHint(q, ans){
   function renderQuestion(){
     state.phase = 'answer'; state.locked = [false,false]; state.ans = [null,null];
     const q = QUESTIONS[state.q];
-    panel.innerHTML = qHead() + eqHTML(q, null) +
-      '<div class="teams">' + answerCard(0) + answerCard(1) + '</div>' +
+    panel.innerHTML = qHead() +
+      '<div class="stage">' +
+        '<div class="boardwrap">' + boardHTML(q, false) +
+          '<button class="btn ghost" id="hintBtn" type="button" aria-expanded="false" aria-controls="hintBox">Show hint</button>' +
+          '<div id="hintBox" hidden><p class="hintbox">' + hintText(q) + '</p>' + (solve(q.a, q.b).steps.some(x => x.borrow) ? legendHTML() : '') + '</div>' +
+        '</div>' +
+        '<div class="teams">' + answerCard(0) + answerCard(1) + '</div>' +
+      '</div>' +
       '<p class="status" id="status" role="status">' + statusText() + '</p>';
     bindCard(0); bindCard(1);
+    $('#hintBtn').addEventListener('click', () => {
+      const box = $('#hintBox'), btn = $('#hintBtn');
+      box.hidden = !box.hidden;
+      $('#board').classList.toggle('show-circles', !box.hidden);
+      btn.textContent = box.hidden ? 'Show hint' : 'Hide hint';
+      btn.setAttribute('aria-expanded', String(!box.hidden));
+    });
     $('#ans0').focus({preventScroll:true});
   }
   function lockAnswer(t){
@@ -465,28 +579,18 @@ function mistakeHint(q, ans){
   }
 
   /* ---------- reveal ---------- */
-  function workGrid(s, q){
-    const lenB = String(q.b).length, lenR = String(s.answer).length;
-    const cols = [...Array(s.n).keys()].reverse();
-    const cell = (cls, html) => '<span class="c ' + cls + '">' + html + '</span>';
-    return '<div class="work" style="--n:' + s.n + '" role="img" aria-label="Column subtraction: ' + fmt(q.a) + ' minus ' + fmt(q.b) + '">' +
-      cell('op','') + cols.map(i => cell('b', s.work[i] !== s.A[i] ? '<b>' + s.work[i] + '</b>' : '')).join('') +
-      cell('op','') + cols.map(i => cell('t' + (s.work[i] !== s.A[i] ? ' x' : ''), s.A[i])).join('') +
-      cell('op','−') + cols.map(i => cell('m', i < lenB ? s.B[i] : '')).join('') +
-      cell('op r','') + cols.map(i => cell('r' + (i >= lenR ? ' z' : ''), s.res[i])).join('') +
-      '</div>';
-  }
   function explanationHTML(q){
     const s = solve(q.a, q.b);
     const bc = s.steps.filter(x => x.borrow).map(x => x.place);
     const intro = bc.length
-      ? 'This problem needs borrowing in the ' + listJoin(bc) + ' ' + (bc.length > 1 ? 'columns' : 'column') + '. When the top digit is smaller than the bottom digit, borrow 1 from the column on its left.'
+      ? 'This problem needs borrowing in the ' + listJoin(bc) + ' ' + (bc.length > 1 ? 'columns' : 'column') + '. When the top digit is smaller than the bottom digit, borrow 1 from the column on its left. Each step below shows the board growing, one column at a time.'
       : 'This problem does not need borrowing. In every column the top digit is equal to or bigger than the bottom digit, so subtract column by column from the right.';
     return '<section class="explain" aria-labelledby="exTitle">' +
-      '<div class="ex-head"><h3 id="exTitle">How to solve ' + fmt(q.a) + ' − ' + fmt(q.b) + '</h3><p>' + intro + '</p></div>' +
-      '<div class="ex-work">' + workGrid(s, q) +
-        (bc.length ? '<p class="legend"><b class="chip-y">17</b> yellow number = new value after borrowing</p>' : '') + '</div>' +
-      '<ol class="steps">' + s.steps.map(st => '<li>' + stepText(st) + '</li>').join('') + '</ol>' +
+      '<div class="ex-head"><h3 id="exTitle">Look at the board. Here is how it works.</h3><p>' + intro + '</p></div>' +
+      '<ol class="steps">' + s.steps.map(st =>
+        '<li><h4>Step ' + (st.i+1) + ': ' + cap(st.place) + ' column</h4><p>' + stepText(st) + '</p>' +
+        '<p class="calc">' + (st.borrow ? st.borrow.now : st.before) + ' − ' + st.bot + ' = <b>' + st.res + '</b></p>' +
+        '<div class="stepboard">' + stepBoard(q, st.i) + '</div></li>').join('') + '</ol>' +
       '<p class="check">Check with addition: ' + fmt(s.answer) + ' + ' + fmt(q.b) + ' = ' + fmt(q.a) + '</p>' +
     '</section>';
   }
@@ -506,13 +610,18 @@ function mistakeHint(q, ans){
     const ok = state.ans.map(v => v === answer);
     state.hist[0].push(ok[0]); state.hist[1].push(ok[1]);
     const anyWrong = ok.some(x => !x), anyMove = ok.some(Boolean);
+    const hasBorrow = solve(q.a, q.b).steps.some(x => x.borrow);
     const last = state.q === TOTAL - 1;
     const sum = state.names.map((n,t) => n + (ok[t] ? ' correct' : ' wrong')).join(', ');
-    panel.innerHTML = qHead() + eqHTML(q, answer) +
-      '<p class="sr" role="status">Results: ' + esc(sum) + '.</p>' +
-      '<div class="teams">' + resultCard(0, ok[0], q) + resultCard(1, ok[1], q) + '</div>' +
+    panel.innerHTML = qHead() +
+      '<p class="sr" role="status">Results: ' + esc(sum) + '. The correct answer is ' + fmt(answer) + '.</p>' +
+      '<div class="stage">' +
+        '<div class="boardwrap">' + boardHTML(q, true) + (anyWrong && hasBorrow ? legendHTML() : '') + '</div>' +
+        '<div class="teams">' + resultCard(0, ok[0], q) + resultCard(1, ok[1], q) + '</div>' +
+      '</div>' +
       (anyWrong ? explanationHTML(q) : '<p class="cheer">Both teams are correct. Both ships sail one stop.</p>') +
       '<div class="actions"><button class="btn" id="nextBtn" type="button" disabled>' + (anyMove ? 'Ship is sailing...' : (last ? 'See results' : 'Next question')) + '</button></div>';
+    if(anyWrong) $('#board').classList.add('show-circles');
     showScene();
     const nextBtn = $('#nextBtn');
     const enable = () => { nextBtn.disabled = false; nextBtn.textContent = last ? 'See results' : 'Next question'; };
